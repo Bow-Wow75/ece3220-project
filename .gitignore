@@ -35,6 +35,8 @@
 .settings/
 .classpath
 .project
+.cproject
+.settings
 
 # Eclipse
 .metadata
