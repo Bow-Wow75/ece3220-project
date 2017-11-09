@@ -12,8 +12,8 @@ using namespace std;
 int main() {
 	int action = 0;
 	while(action != -1)
-	{
-			//print menu
+	{//print menu
+		printMenu();
 	}
 	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
 	return 0;
