@@ -6,7 +6,6 @@
 // Description : Stock trading program for ece 3220
 //============================================================================
 
-#include <iostream>
 #include "header.h"
 using namespace std;
 
