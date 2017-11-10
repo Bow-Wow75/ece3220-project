@@ -6,7 +6,7 @@
 //  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
 //
 
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....ECLIPSE USE 1...............///////////
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -140,7 +140,12 @@ void Account::readstock_price(){
     string name;
     double price;
     int found = 0;
+#if COMPILER == 0
     input.open("market_price.txt");
+#endif
+#if COMPILER == 1
+    input.open("inputfiles/market_price.txt");
+#endif
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
