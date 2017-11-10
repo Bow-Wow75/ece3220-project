@@ -7,6 +7,7 @@
 //
 
 #define ACCOUNTS "accounts.txt"
+#define STOCKS "stocks.txt"
 
 #include <iostream>
 #include <fstream>
