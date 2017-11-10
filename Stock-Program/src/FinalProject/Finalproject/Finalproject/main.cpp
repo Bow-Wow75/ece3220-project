@@ -28,33 +28,21 @@ class Account{
         string account_id;
         string account_password;
         int account_type;// 1 is admin, 5 is user
-<<<<<<< HEAD
         double balance;
         vector<string> stock_name;
         vector<double> number_shares;
         vector<double> stock_price;
-    
-=======
-
->>>>>>> 5072a5e04f2ec95dd04738389f0a51449a716da8
+        vector<double> availableStocks;// eric
     public:
         Account();
         ~Account();
         void login();
         void locate_account(string entered_id, string entered_password );
         void menu();
-<<<<<<< HEAD
         void display_profolio();
         void read_accountinfo();
         void readstock_price();
-    
-    
-    
-=======
-
-
-
-
+        void loadstocks();// may use later in the code
 };
 
 class Stock{
@@ -81,8 +69,6 @@ private:
 protected:
 
 public:
-
->>>>>>> 5072a5e04f2ec95dd04738389f0a51449a716da8
 };
 
 
@@ -106,11 +92,11 @@ void Stock::printStocks()
 
 
 
-vector<Stock> loadStocks()
+void Account:: loadstocks()
 {
 
 
-		std::ifstream inputFile;
+		ifstream inputFile;
 		inputFile.open("stocks.txt");
 		//int fileError = 0;
 
@@ -130,8 +116,6 @@ vector<Stock> loadStocks()
 		}
 
 		inputFile.close();
-		return availableStocks;
-
 }
 
 void printMenu()
@@ -142,12 +126,6 @@ void printMenu()
 		 << "(4) Account info: " << endl
 		 << "(5) Update account balance: " << endl;
 }
-
-
-
-//........End my functions.......//
-
-
 Account::Account(){
     
 }
@@ -166,7 +144,7 @@ void Account::readstock_price(){
         cout<<"error reading in market prices"<<endl;
     }
     //int total
-    for( int i = 0; i < (stock_name.size()-1); i++){
+    for( int i = 0; i < (stock_name.size()-1); i++){//*****************************Use for layout for the search function******************************
         while( !input.eof() || found != 0)
         {
             input>>name;
@@ -238,15 +216,9 @@ void Account::menu(){
         cout<<"Select what you would like to do"<<endl
         <<"\t1: Buy stocks: "<<endl
         <<"\t2: Sell stocks: "<<endl
-<<<<<<< HEAD
         <<"\t3: Set stock to buy or sell: "<<endl
         <<"\t4: Display profolio: "<<endl
         <<"\t5: To Exit your profolio: "<<endl;
-=======
-        <<"\t3: Set stock to buy or sell"<<endl
-        <<"\t4: Display portfolio"<<endl
-        <<"\t5: to exit your profolio"<<endl;
->>>>>>> 5072a5e04f2ec95dd04738389f0a51449a716da8
         cin>>choice;
         
         switch( choice ){
@@ -349,32 +321,4 @@ int main( int argc, char** argv){
     {
         cout<<"Error opening the accounts file"<<endl;
     }
-    
-    
-    
-	int action = 0;
-
-	try{
-	vector<Stock> availableStocks = loadStocks();
-
-	for(int i=0;i<availableStocks.size();i++)
-	{
-		availableStocks[i].printStocks();
-	}
-
-	}
-
-	catch(int fileError)
-	{
-		cout << "Could not open file" << endl;
-	}
-
-	while(action != -1)
-	{//print menu
-		printMenu();
-		cin >> action;
-	}
-
-
-
 }
