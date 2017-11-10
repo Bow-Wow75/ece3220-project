@@ -1,0 +1,10 @@
+Boeing 262.70
+AMD 11.12
+Intel 46.40
+Alphabet_Inc 1047.72
+Lockheed_Martin_Corporation 311.08
+Walt_Disney_Co 102.68
+Twitter_Inc 19.90
+Facebook 179.30
+Garmin_Ltd 59.72
+Apple_Inc 175.88

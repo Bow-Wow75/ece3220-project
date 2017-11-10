@@ -1,19 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
 
 
 class Stock{
 private:
-	double value;
-	std::string name;
 
 protected:
 
 public:
-	std::vector<Stock> loadStocks();
+	double value;
+	std::string name;
+
+	void printStocks();
 	//constructor
-	Stock(std::string name, double value);
 
 };
 
@@ -32,3 +33,4 @@ public:
 
 
 void printMenu();
+std::vector<Stock> loadStocks();

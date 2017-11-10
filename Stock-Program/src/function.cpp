@@ -9,23 +9,44 @@
 
 using namespace std;
 
-//Stock constructor
-Stock::Stock(string named, double valued)
+void Stock::printStocks()
 {
-	name = named;
-	value = valued;
+	cout << name << "  " << value << endl;
 }
 
-vector<Stock> Stock::loadStocks()
+
+
+vector<Stock> loadStocks()
 {
 
-	Stock boeing("Boeing", 262.70);
-	Stock AMD("AMD", 11.12);
-	Stock intel("Intel", 46.40);
 
-	vector<Stock> availableStocks{boeing, AMD, intel};
+		std::ifstream inputFile;
+		inputFile.open("stocks.txt");
+		//int fileError = 0;
 
-return availableStocks;
+		if(!inputFile)
+		{
+
+			cerr << "Unable to open file" << endl;
+	/*		try
+			{
+			throw 0;
+			}
+			catch(int error){
+
+			}*/
+		}
+
+		vector<Stock> availableStocks;
+		Stock temp;
+
+		while(inputFile >> temp.name >> temp.value)
+		{
+			availableStocks.push_back(temp);
+		}
+
+		inputFile.close();
+		return availableStocks;
 
 }
 
