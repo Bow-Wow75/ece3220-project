@@ -21,7 +21,7 @@
 
 using namespace std;
 
-string input_file = "accounts.txt";// stores the list of accounts for the program and there passwords
+string input_file = "accounts.txt";// stores the list of accounts for the program and their passwords
 
 class Account{
     protected:
@@ -32,7 +32,7 @@ class Account{
         vector<string> stock_name;
         vector<double> number_shares;
         vector<double> stock_price;
-        vector<double> availableStocks;// eric
+        vector<double> availableStocks;// erik
     public:
         Account();
         ~Account();
@@ -172,7 +172,7 @@ void Account::read_accountinfo(){
     string name;
     int number;
     ifstream input;
-    input.open(filename);
+    input.open(filename.c_str());
     if( !input.is_open())
     {
         throw reading_file;
