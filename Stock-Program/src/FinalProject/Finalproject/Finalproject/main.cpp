@@ -39,10 +39,6 @@ class Account{
 
 };
 
-
-
-
-
 class Stock{
 private:
 
@@ -69,6 +65,11 @@ protected:
 public:
 
 };
+
+
+
+void printMenu();
+std::vector<Stock> loadStocks();
 
 //.........END HEADER........//
 
@@ -128,9 +129,6 @@ void printMenu()
 //........End my functions.......//
 
 
-void printMenu();
-std::vector<Stock> loadStocks();
-
 Account::Account(){
     
 }
@@ -147,7 +145,7 @@ void Account::menu(){
         <<"\t1: Buy stocks: "<<endl
         <<"\t2: Sell stocks: "<<endl
         <<"\t3: Set stock to buy or sell"<<endl
-        <<"\t4: Display profolio"<<endl
+        <<"\t4: Display portfolio"<<endl
         <<"\t5: to exit your profolio"<<endl;
         cin>>choice;
         
