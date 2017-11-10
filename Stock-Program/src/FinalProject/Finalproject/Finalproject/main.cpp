@@ -27,24 +27,126 @@ class Account{
         string account_id;
         string account_password;
         int account_type;// 1 is admin, 5 is user
+<<<<<<< HEAD
         double balance;
         vector<string> stock_name;
         vector<double> number_shares;
         vector<double> stock_price;
     
+=======
+
+>>>>>>> 5072a5e04f2ec95dd04738389f0a51449a716da8
     public:
         Account();
         ~Account();
         void login();
         void locate_account(string entered_id, string entered_password );
         void menu();
+<<<<<<< HEAD
         void display_profolio();
         void read_accountinfo();
         void readstock_price();
     
     
     
+=======
+
+
+
+
 };
+
+class Stock{
+private:
+
+protected:
+
+public:
+	double value;
+	std::string name;
+
+	void printStocks();
+	//constructor
+
+};
+
+
+class User{
+private:
+	double balance;
+	int id;
+	std::vector<Stock> stocks;
+	std::vector<int> stockNums;
+protected:
+
+public:
+
+>>>>>>> 5072a5e04f2ec95dd04738389f0a51449a716da8
+};
+
+
+
+void printMenu();
+std::vector<Stock> loadStocks();
+
+//.........END HEADER........//
+
+
+
+
+//..........from Erik's functions........//
+
+
+
+void Stock::printStocks()
+{
+	cout << name << "  " << value << endl;
+}
+
+
+
+vector<Stock> loadStocks()
+{
+
+
+		std::ifstream inputFile;
+		inputFile.open("stocks.txt");
+		//int fileError = 0;
+
+		if(!inputFile)
+		{
+
+			cerr << "Unable to open file" << endl;
+			throw 0;
+		}
+
+		vector<Stock> availableStocks;
+		Stock temp;
+
+		while(inputFile >> temp.name >> temp.value)
+		{
+			availableStocks.push_back(temp);
+		}
+
+		inputFile.close();
+		return availableStocks;
+
+}
+
+void printMenu()
+{
+	cout << "(1) See Available stocks: " << endl
+		 << "(2) Sell stocks: " << endl
+		 << "(3) Set Stock Seller Requirements" << endl
+		 << "(4) Account info: " << endl
+		 << "(5) Update account balance: " << endl;
+}
+
+
+
+//........End my functions.......//
+
+
 Account::Account(){
     
 }
@@ -135,9 +237,15 @@ void Account::menu(){
         cout<<"Select what you would like to do"<<endl
         <<"\t1: Buy stocks: "<<endl
         <<"\t2: Sell stocks: "<<endl
+<<<<<<< HEAD
         <<"\t3: Set stock to buy or sell: "<<endl
         <<"\t4: Display profolio: "<<endl
         <<"\t5: To Exit your profolio: "<<endl;
+=======
+        <<"\t3: Set stock to buy or sell"<<endl
+        <<"\t4: Display portfolio"<<endl
+        <<"\t5: to exit your profolio"<<endl;
+>>>>>>> 5072a5e04f2ec95dd04738389f0a51449a716da8
         cin>>choice;
         
         switch( choice ){
@@ -171,7 +279,7 @@ void Account:: locate_account(string entered_id, string entered_password ){
     int input_error = 0;
    string user_id, password;
     ifstream input;
-    input.open(input_file);
+    input.open(input_file.c_str());
     if( !input.is_open())
     {
         throw input_error;
@@ -243,4 +351,29 @@ int main( int argc, char** argv){
     
     
     
+	int action = 0;
+
+	try{
+	vector<Stock> availableStocks = loadStocks();
+
+	for(int i=0;i<availableStocks.size();i++)
+	{
+		availableStocks[i].printStocks();
+	}
+
+	}
+
+	catch(int fileError)
+	{
+		cout << "Could not open file" << endl;
+	}
+
+	while(action != -1)
+	{//print menu
+		printMenu();
+		cin >> action;
+	}
+
+
+
 }
