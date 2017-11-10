@@ -14,7 +14,8 @@ int main() {
 	while(action != -1)
 	{//print menu
 		printMenu();
+		cin >> action;
 	}
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
+
 	return 0;
 }

@@ -11,6 +11,9 @@ private:
 protected:
 
 public:
+	std::vector<Stock> loadStocks();
+	//constructor
+	Stock(std::string name, double value);
 
 };
 
