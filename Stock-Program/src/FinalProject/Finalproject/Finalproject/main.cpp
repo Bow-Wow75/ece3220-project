@@ -6,11 +6,8 @@
 //  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
 //
 
-<<<<<<< HEAD
+
 #define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
-=======
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....ECLIPSE COMPILER USE 1...............///////////
->>>>>>> 744ea85bb8c904ee05395af82f07c56cb05bc13b
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -200,48 +197,70 @@ Account::~Account(){
     
 }
 void Account::readstock_price(){
+    
     ifstream input;
     string name;
     double price;
-    int found = 0;
-
+    int found = 9;
 #if COMPILER == 0
     input.open("market_price.txt");
 #endif
 #if COMPILER == 1
     input.open("inputfiles/market_price.txt");
 #endif
-
+   
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
     }
-    int j = 0;
+   int j = 0;
     //int total
-    for( int i = 0; i < (stock_name.size()); i++){//*****************************Use for layout for the search function******************************
+    /*for( int i = 0; i < (stock_name.size()); i++){//*****************************Use for layout for the search function******************************
     	j=0;
-        while( input >> name >> price)
+        
+        while( !input.eof() || found != 0)
         {
-            if(stock_name[j].compare(name) == 0){
+            input>>name;
+            input>>price;
+            if(stock_name[i].compare(name) == 0){
                 stock_price.push_back(price);
-<<<<<<< HEAD
-                cout<<""<<name<<endl;
-                cout<<""<<price<<endl;
-=======
-
                 cout<<name<<endl;
                 cout<<price<<endl;
 
                 //cout<<""<<name<<endl;
                 //cout<<""<<price<<endl;
-
->>>>>>> 744ea85bb8c904ee05395af82f07c56cb05bc13b
                 found = 0;
-                j++;
+                i++;
                 input.seekg(0, ios::beg);
             }
             
+        }*/
+    for( int i = 0; i < (stock_name.size()-1); i++){
+       
+        while( found != 0)
+        {
+            input>>name;
+            input>>price;
+            
+            if(stock_name[i].compare(name) == 0){
+                stock_price.push_back(price);
+                cout<<""<<name<<endl;
+                cout<<""<<price<<endl;
+                found = 0;
+            }
+            if( input.eof())
+            {
+                input.clear();
+                input.seekg(0, ios::beg);
+                found = 0;
+                cout<<"Stock was not found: "<<stock_name[i]<<endl;
+                
+            }
+            
+            
         }
+        found = 9;
+        //input.seekg(0, ios::beg);
         
     }
         
