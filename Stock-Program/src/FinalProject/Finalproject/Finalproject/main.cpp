@@ -6,7 +6,10 @@
 //  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
 //
 
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+
 #define ACCOUNTS "accounts.txt"
+#define STOCKS "stocks.txt"
 
 #include <iostream>
 #include <fstream>
@@ -20,7 +23,7 @@
 
 using namespace std;
 
-string input_file = "accounts.txt";// stores the list of accounts for the program and there passwords
+string input_file = "accounts.txt";// stores the list of accounts for the program and their passwords
 
 class Account{
     protected:
@@ -31,7 +34,7 @@ class Account{
         vector<string> stock_name;
         vector<double> number_shares;
         vector<double> stock_price;
-        vector<double> availableStocks;// eric
+        vector<double> availableStocks;// erik
     public:
         Account();
         ~Account();
@@ -196,7 +199,12 @@ void Account::readstock_price(){
     string name;
     double price;
     int found = 0;
+#if COMPILER == 0
     input.open("market_price.txt");
+#endif
+#if COMPILER == 1
+    input.open("inputfiles/market_price.txt");
+#endif
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
@@ -226,14 +234,14 @@ void Account::readstock_price(){
 void Account::read_accountinfo(){
     string filename;
     filename = account_id +".txt";
-    int reading_file = 0;
+    int readFile_error = 0;
     string name;
     int number;
     ifstream input;
-    input.open(filename);
+    input.open(filename.c_str());
     if( !input.is_open())
     {
-        throw reading_file;
+        throw readFile_error;
     }
     input>>balance;
     while( !input.eof())
@@ -308,11 +316,22 @@ void Account::menu(){
 }
 void Account:: locate_account(string entered_id, string entered_password ){
     int type;
-    int input_error = 0;
+    int input_error = 1;
    string user_id, password;
     ifstream input;
+
+
+#if COMPILER ==1
+    //................gnu compiler needs input_file defined.....................................//
+
+    string input_file = "inputfiles/accounts.txt";
+
+    //..........................This may need removed in XCode^^^^  !!!CHANGE COMPILER TO 0, DON'T DELETE!!!.............................////////
+#endif
+
     input.open(input_file.c_str());
-    if( !input.is_open())
+
+    if(!input)
     {
         throw input_error;
     }
@@ -341,6 +360,8 @@ void Account::login(){
     string exit = "";
    try
     {
+
+
         do{
         if( incorrect == 2)
         {
@@ -359,9 +380,12 @@ void Account::login(){
       
     }
     
-    catch( int )
+    catch( int error )
     {
+    	if(error == 0)
         cout<<"login was successful"<<endl;
+    	if(error == 1)
+    		cout << "Unable to open file" << endl;
     }
 }
 
