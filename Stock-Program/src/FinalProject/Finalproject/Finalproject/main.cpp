@@ -45,6 +45,8 @@ class Account{
         void read_accountinfo();
         void readstock_price();
         void loadstocks();// may use later in the code
+        void setstockformarketcharge();
+        void search_forstock(string stock); // will open available stocks and search for that stock in the folder
 };
 
 class Stock{
@@ -91,8 +93,65 @@ void Stock::printStocks()
 {
 	cout << name << "  " << value << endl;
 }
+void Account::setstockformarketcharge(){
+    string stock;
 
+    try{
+        // try block to determine is the stock is available
+    cout<<"Enter the name of the stock you would like to buy or sell"<<endl;
+    cin>>stock;
+    this->search_forstock(stock);
+        
+    }
+    
+    
+    
+    catch( double price)
+    {
+    ofstream input;
+    input.open("set_to_sell_or_buy.txt");
+    if(!input.is_open())
+    {
+        cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
+    }
+    // a why of getting to the end of the file will need to be implemented
+    {
+        input<<account_id<<stock<<price<<endl;
+        
+    }
+        input.close();
+    }
+    
+}
+void Account::search_forstock(string stock){
+    double price;
+    int found = 0;
+    string name;
 
+    ifstream input;
+    input.open("market_price.txt");
+    if( !input.is_open())
+    {
+        cout<<"error reading in market prices"<<endl;
+    }
+    //int total
+        while( !input.eof() || found != 0)
+        {
+            input>>name;
+            input>>price;
+            if(stock.compare(name) == 0){
+                stock_price.push_back(price);
+                //cout<<""<<name<<endl;
+               // cout<<""<<price<<endl;
+                found = 0;
+                input.seekg(0, ios::beg);
+                throw price;
+            };
+            
+        }
+    input.close();
+    
+}
 
 void Account:: loadstocks()
 {
@@ -160,8 +219,13 @@ void Account::readstock_price(){
         {
             if(stock_name[j].compare(name) == 0){
                 stock_price.push_back(price);
+
                 cout<<name<<endl;
                 cout<<price<<endl;
+
+                //cout<<""<<name<<endl;
+                //cout<<""<<price<<endl;
+
                 found = 0;
                 j++;
                 input.seekg(0, ios::beg);
@@ -241,6 +305,7 @@ void Account::menu(){
             case 2: //Sell stock
                 break;
             case 3: // set stock to buy or sell
+                setstockformarketcharge();
                 break;
             case 4:// display profolio
                 this->display_profolio();
