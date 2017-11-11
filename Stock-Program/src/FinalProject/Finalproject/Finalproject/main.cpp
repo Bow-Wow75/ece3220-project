@@ -6,7 +6,7 @@
 //  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
 //
 
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -116,7 +116,8 @@ void Account::setstockformarketcharge(){
     }
     // a why of getting to the end of the file will need to be implemented
     {
-        input<<account_id<<stock<<price<<endl;
+       // input.seekg(0, ios::end);
+        input<<""<<account_id<<""<<stock<<""<<price<<endl;
         
     }
         input.close();
@@ -141,8 +142,8 @@ void Account::search_forstock(string stock){
             input>>price;
             if(stock.compare(name) == 0){
                 stock_price.push_back(price);
-                //cout<<""<<name<<endl;
-               // cout<<""<<price<<endl;
+                cout<<""<<name<<endl;
+                cout<<""<<price<<endl;
                 found = 0;
                 input.seekg(0, ios::beg);
                 throw price;
@@ -217,8 +218,8 @@ void Account::readstock_price(){
             input>>price;
             if(stock_name[i].compare(name) == 0){
                 stock_price.push_back(price);
-                //cout<<""<<name<<endl;
-                //cout<<""<<price<<endl;
+                cout<<""<<name<<endl;
+                cout<<""<<price<<endl;
                 found = 0;
                 i++;
                 input.seekg(0, ios::beg);
