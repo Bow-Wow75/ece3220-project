@@ -6,7 +6,11 @@
 //  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
 //
 
+<<<<<<< HEAD
 #define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+=======
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....ECLIPSE COMPILER USE 1...............///////////
+>>>>>>> 744ea85bb8c904ee05395af82f07c56cb05bc13b
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -32,7 +36,7 @@ class Account{
         int account_type;// 1 is admin, 5 is user
         double balance;
         vector<string> stock_name;
-        vector<double> number_shares;
+        vector<int> number_shares;
         vector<double> stock_price;
         vector<double> availableStocks;// erik
     public:
@@ -200,30 +204,42 @@ void Account::readstock_price(){
     string name;
     double price;
     int found = 0;
+
 #if COMPILER == 0
     input.open("market_price.txt");
 #endif
 #if COMPILER == 1
     input.open("inputfiles/market_price.txt");
 #endif
+
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
     }
+    int j = 0;
     //int total
-    for( int i = 0; i < (stock_name.size()-1); i++){//*****************************Use for layout for the search function******************************
-        while( !input.eof() || found != 0)
+    for( int i = 0; i < (stock_name.size()); i++){//*****************************Use for layout for the search function******************************
+    	j=0;
+        while( input >> name >> price)
         {
-            input>>name;
-            input>>price;
-            if(stock_name[i].compare(name) == 0){
+            if(stock_name[j].compare(name) == 0){
                 stock_price.push_back(price);
+<<<<<<< HEAD
                 cout<<""<<name<<endl;
                 cout<<""<<price<<endl;
+=======
+
+                cout<<name<<endl;
+                cout<<price<<endl;
+
+                //cout<<""<<name<<endl;
+                //cout<<""<<price<<endl;
+
+>>>>>>> 744ea85bb8c904ee05395af82f07c56cb05bc13b
                 found = 0;
-                i++;
+                j++;
                 input.seekg(0, ios::beg);
-            };
+            }
             
         }
         
@@ -245,14 +261,16 @@ void Account::read_accountinfo(){
         throw readFile_error;
     }
     input>>balance;
-    while( !input.eof())
+    while(input >> name >> number)
     {
-        input>>name;
+        //input>>name;
         stock_name.push_back(name);
         
-        input>>number;
+        //input>>number;
         number_shares.push_back(number);
     }
+
+
     input.close();
     this->readstock_price();
 }
@@ -263,12 +281,14 @@ void Account::display_profolio(){
     cout<<"Profolio for "<<account_id<<endl;
     cout<<"Account Balance: "<<balance<<endl;
     
-    cout<<"Stock"<<"Shares "<<"Price"<<endl;
+    cout<<"Stock "<<"Shares "<<"Price"<<endl;
     
-    for( i = 0; i <(stock_name.size()-1); i++)
+    for( i = 0; i <stock_name.size(); i++)
     {
-        
+      //  cout << "test1" << endl;
         cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<" "<<stock_price[i]<<endl;
+      //  cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<endl;
+
     }
     
 }

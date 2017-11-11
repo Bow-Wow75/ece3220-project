@@ -1,7 +1,13 @@
 Amazon 500
-Beoing 1000
+Boeing 1000
 AMD 23
 Intel 300
+<<<<<<< HEAD
 Alphabet_Inc .04
 Apple_Inc .03
 Netflix 193
+=======
+Alphabet_Inc 0.04
+Apple_Inc 0.03
+Netflix 193
+>>>>>>> 744ea85bb8c904ee05395af82f07c56cb05bc13b
