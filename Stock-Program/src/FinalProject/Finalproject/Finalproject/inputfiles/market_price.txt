@@ -1,7 +1,7 @@
 Amazon 500
-Beoing 1000
+Boeing 1000
 AMD 23
 Intel 300
-Alphabet_Inc .04
-Apple_Inc .03
+Alphabet_Inc 0.04
+Apple_Inc 0.03
 Netflix 193
