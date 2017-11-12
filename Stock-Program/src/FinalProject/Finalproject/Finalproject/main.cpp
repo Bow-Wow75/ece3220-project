@@ -39,6 +39,7 @@ class Account{
     public:
         Account();
         ~Account();
+        void sellStocks();
         void update_user_file();
         void buyStocks();
         void login();
@@ -89,6 +90,59 @@ std::vector<Stock> loadStocks();
 
 
 //..........from Erik's functions........//
+
+void Account::sellStocks()
+{
+	string name;
+	int number;
+	int check=0;
+	cout << "Enter name of stock to sell: " << endl;
+	cin >> name;
+	cout << "Enter the number of Stocks you would like to sell: " << endl;
+	cin >> number;
+
+	for(int i=0;i<stock_name.size();i++)
+	{
+		if(stock_name[i].compare(name)==0)
+		{
+			if((number_shares[i]-number) < 0)
+			{
+				throw 2;
+			}
+			else if((number_shares[i]-number)==0)
+			{
+				stock_name.erase(stock_name.begin()+i);
+				number_shares.erase(number_shares.begin()+i);
+				balance += number*stock_price[i];
+				check = 1;
+			}
+			else{
+			number_shares[i] -= number;
+			check = 1;
+			}
+			break;
+		}
+	}
+
+	if(check == 0)
+	{
+		throw 21;
+	}
+
+	stock_price.clear();
+	this->readstock_price();
+
+	/*for(int i=0;i<stock_name.size();i++)
+	{
+		if(stock_name[i].compare(name) == 0)
+		{
+			balance += number*stock_price[i];
+		}
+	}*/
+
+	update_user_file();
+	return;
+}
 
 void Account::update_user_file()
 {
@@ -395,8 +449,15 @@ void Account::menu(){
     //User function
     int choice;
     try{
-        
     this->read_accountinfo();
+    }
+
+    catch( int reading_error)
+    {
+        cout<<"Error reading the users file"<<endl;
+    }
+    try{
+
     if( account_type == 5 )
     {
         cout<<"Select what you would like to do"<<endl
@@ -413,6 +474,7 @@ void Account::menu(){
             	buyStocks();
                 break;
             case 2: //Sell stock
+            	sellStocks();
                 break;
             case 3: // set stock to buy or sell
                 setstockformarketcharge();
@@ -428,10 +490,21 @@ void Account::menu(){
                 
         }
     }
-       }
-    catch( int reading_error)
+    }//for try statement
+
+    catch(int menuError)
     {
-        cout<<"Error reading the users file"<<endl;
+    	switch(menuError)
+    	{
+    	case 2: cout << "Not enough stocks to sell" << endl;
+    	break;
+
+    	case 21: cout << "Stock not found" << endl;
+    	break;
+
+    	default: cout << "Unknown error has occurred" << endl;
+    	break;
+    	}
     }
     
     

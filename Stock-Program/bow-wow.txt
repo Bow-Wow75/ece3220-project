@@ -1,5 +1,4 @@
-4000
-Boeing 3
+7000
 Intel 70
 Alphabet_Inc 5
 Netflix 21
