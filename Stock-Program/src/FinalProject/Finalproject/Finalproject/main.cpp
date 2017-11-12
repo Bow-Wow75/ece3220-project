@@ -7,7 +7,7 @@
 //
 
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -39,6 +39,8 @@ class Account{
     public:
         Account();
         ~Account();
+        void update_user_file();
+        void buyStocks();
         void login();
         void locate_account(string entered_id, string entered_password );
         void menu();
@@ -88,6 +90,76 @@ std::vector<Stock> loadStocks();
 
 //..........from Erik's functions........//
 
+void Account::update_user_file()
+{
+		  string filename;
+		    filename = account_id +".txt";
+
+
+
+		std::ofstream outputFile(filename.c_str());
+		int i = 0;
+
+		if (outputFile.is_open()) //if the file is open
+		    {
+
+			outputFile << balance << endl;
+			//outputFile << max;
+		        for(i=0;i<stock_name.size();i++) //while the end of file is NOT reached
+		        {
+		            outputFile << stock_name[i] << " " << number_shares[i] << endl;
+		        }
+		        outputFile.close(); //closing the file
+		    }
+		    else
+		    	{
+		    	cout << "Unable to open file\n"; //if the file is not open output
+		    	return;
+	}
+
+
+}
+
+void Account::buyStocks()
+{
+	string name;
+	int number;
+	int check=0;
+	cout << "Enter name of stock to buy: " << endl;
+	cin >> name;
+	cout << "Enter the number of Stocks you would like to buy: " << endl;
+	cin >> number;
+
+	for(int i=0;i<stock_name.size();i++)
+	{
+		if(stock_name[i].compare(name)==0)
+		{
+			number_shares[i] += number;
+			check = 1;
+			break;
+		}
+	}
+
+	if(check == 0)
+	{
+		stock_name.push_back(name);
+		number_shares.push_back(number);
+	}
+
+	stock_price.clear();
+	this->readstock_price();
+
+	for(int i=0;i<stock_name.size();i++)
+	{
+		if(stock_name[i].compare(name) == 0)
+		{
+			balance -= number*stock_price[i];
+		}
+	}
+
+	update_user_file();
+	return;
+}
 
 
 void Stock::printStocks()
@@ -235,8 +307,11 @@ void Account::readstock_price(){
             }
             
         }*/
-    for( int i = 0; i < (stock_name.size()-1); i++){
+    for( int i = 0; i < (stock_name.size()); i++){
        
+    	found = 9;
+       // input>>name;
+        //input>>price;
         while( found != 0)
         {
             input>>name;
@@ -247,18 +322,23 @@ void Account::readstock_price(){
                 cout<<""<<name<<endl;
                 cout<<""<<price<<endl;
                 found = 0;
+                input.seekg(0, ios::beg);//I added this because it was only going back to the top of the file when
+
             }
-            if( input.eof())
+            if( input.eof() && found == 9)
             {
                 input.clear();
                 input.seekg(0, ios::beg);
                 found = 0;
                 cout<<"Stock was not found: "<<stock_name[i]<<endl;
                 
+
             }
             
             
         }
+       // input.seekg(0, ios::beg);//I added this because it was only going back to the top of the file when
+        //we hit the end of file, but we need to look at stocks from top to bottom each time
         found = 9;
         //input.seekg(0, ios::beg);
         
@@ -330,6 +410,7 @@ void Account::menu(){
         switch( choice ){
         
             case 1: // Buy stock
+            	buyStocks();
                 break;
             case 2: //Sell stock
                 break;
@@ -341,6 +422,8 @@ void Account::menu(){
                 break;
             case 5:// implement a throw to exit the program
                 break; 
+            default:
+            	break;
                 
                 
         }

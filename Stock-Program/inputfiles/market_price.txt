@@ -5,3 +5,5 @@ Intel 300
 Alphabet_Inc .04
 Apple_Inc .03
 Netflix 193
+Alphabet_Inc 0.04
+Apple_Inc 0.03

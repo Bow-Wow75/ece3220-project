@@ -1,6 +1,7 @@
-1000
+4000
 Boeing 3
 Intel 70
 Alphabet_Inc 5
-AMD 71
 Netflix 21
+Apple_Inc 2
+Amazon 3
