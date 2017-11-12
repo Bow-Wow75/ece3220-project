@@ -118,6 +118,7 @@ void Account::sellStocks()
 			}
 			else{
 			number_shares[i] -= number;
+			balance += number*stock_price[i];
 			check = 1;
 			}
 			break;
@@ -184,10 +185,15 @@ void Account::buyStocks()
 	cout << "Enter the number of Stocks you would like to buy: " << endl;
 	cin >> number;
 
-	for(int i=0;i<stock_name.size();i++)
+	int i;
+	for(i=0;i<stock_name.size();i++)
 	{
 		if(stock_name[i].compare(name)==0)
 		{
+			if((balance -(stock_price[i]*number)) < 0)
+			{
+				throw 1;
+			}
 			number_shares[i] += number;
 			check = 1;
 			break;
@@ -197,13 +203,37 @@ void Account::buyStocks()
 	if(check == 0)
 	{
 		stock_name.push_back(name);
+		number_shares.push_back(0);
+
+		try{
+		stock_price.clear();
+		this->readstock_price();
+		number_shares[i] = number;
+		}
+
+		catch(int error)
+		{
+			if(error == 11)
+			{
+				stock_name.pop_back();
+				number_shares.pop_back();
+			}
+		}
+
+		if((balance - (stock_price.back()*number)) < 0)
+		{
+			stock_name.pop_back();
+			number_shares.pop_back();
+			throw 1;
+		}
+
 		number_shares.push_back(number);
 	}
 
 	stock_price.clear();
 	this->readstock_price();
 
-	for(int i=0;i<stock_name.size();i++)
+	for(i=0;i<stock_name.size();i++)
 	{
 		if(stock_name[i].compare(name) == 0)
 		{
@@ -385,6 +415,7 @@ void Account::readstock_price(){
                 input.seekg(0, ios::beg);
                 found = 0;
                 cout<<"Stock was not found: "<<stock_name[i]<<endl;
+                throw 11;
                 
 
             }
@@ -496,6 +527,9 @@ void Account::menu(){
     {
     	switch(menuError)
     	{
+    	case 1: cout << "Not enough money in account" << endl;
+    	break;
+
     	case 2: cout << "Not enough stocks to sell" << endl;
     	break;
 
