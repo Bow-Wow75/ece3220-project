@@ -1,7 +1,7 @@
-6978
+7001
 Intel 67
 Alphabet_Inc 5
 Netflix 21
 Apple_Inc 2
 Amazon 3
-AMD 4
+AMD 3

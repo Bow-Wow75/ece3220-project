@@ -8,6 +8,7 @@
 
 
 #define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+						////...........This is needed primarily because XCode handles files very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -140,7 +141,8 @@ void Account::sellStocks()
 void Account::update_user_file()
 {
 		  string filename;
-		    filename = account_id +".txt";
+		    filename = "inputfiles/accounts/" +account_id + ".txt";
+
 
 
 
@@ -417,7 +419,12 @@ void Account::readstock_price(){
 }
 void Account::read_accountinfo(){
     string filename;
+#if COMPILER == 0
     filename = account_id +".txt";
+#endif
+#if COMPILER == 1
+    filename = "inputfiles/accounts/" +account_id + ".txt";
+#endif
     int readFile_error = 0;
     string name;
     int number;
