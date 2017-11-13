@@ -103,20 +103,20 @@ void Account::sellStocks()
 
 	for(int i=0;i<stock_name.size();i++)
 	{
-		if(stock_name[i].compare(name)==0)
+		if(stock_name[i].compare(name)==0)//iterate until we find the stock that matches
 		{
-			if((number_shares[i]-number) < 0)
+			if((number_shares[i]-number) < 0)//ensure we have enough stocks to sell
 			{
 				throw 2;
 			}
-			else if((number_shares[i]-number)==0)
+			else if((number_shares[i]-number)==0)//delete the stock element if we sell them all
 			{
 				stock_name.erase(stock_name.begin()+i);
 				number_shares.erase(number_shares.begin()+i);
 				balance += number*stock_price[i];
 				check = 1;
 			}
-			else{
+			else{//update stock numbers and balance
 			number_shares[i] -= number;
 			balance += number*stock_price[i];
 			check = 1;
@@ -125,12 +125,12 @@ void Account::sellStocks()
 		}
 	}
 
-	if(check == 0)
+	if(check == 0)//stock isn't found so throw error code
 	{
 		throw 21;
 	}
 
-	stock_price.clear();
+	stock_price.clear();//update stock values
 	this->readstock_price();
 
 	/*for(int i=0;i<stock_name.size();i++)
@@ -141,7 +141,7 @@ void Account::sellStocks()
 		}
 	}*/
 
-	update_user_file();
+	update_user_file();//update user file
 	return;
 }
 
@@ -159,7 +159,7 @@ void Account::update_user_file()
 		    {
 
 			outputFile << balance << endl;
-			//outputFile << max;
+
 		        for(i=0;i<stock_name.size();i++) //while the end of file is NOT reached
 		        {
 		            outputFile << stock_name[i] << " " << number_shares[i] << endl;
@@ -186,62 +186,54 @@ void Account::buyStocks()
 	cin >> number;
 
 	int i;
-	for(i=0;i<stock_name.size();i++)
+	for(i=0;i<stock_name.size();i++)//iterate until stock is found
 	{
 		if(stock_name[i].compare(name)==0)
 		{
-			if((balance -(stock_price[i]*number)) < 0)
+			if((balance -(stock_price[i]*number)) < 0)//ensure user has enough money
 			{
 				throw 1;
 			}
-			number_shares[i] += number;
+			number_shares[i] += number;//update share numbers
+			balance -= number*stock_price[i];
 			check = 1;
 			break;
 		}
 	}
 
-	if(check == 0)
+	if(check == 0)//this runs if this is the first time the user buys this companies stock
 	{
 		stock_name.push_back(name);
-		number_shares.push_back(0);
+		number_shares.push_back(0);//We don't want to give user the stocks until we know they have enough money
 
 		try{
 		stock_price.clear();
 		this->readstock_price();
-		number_shares[i] = number;
+		//number_shares[i] = number;
 		}
 
 		catch(int error)
 		{
-			if(error == 11)
+			if(error == 11)//runs if the stock doesn't exist in our market file
 			{
 				stock_name.pop_back();
 				number_shares.pop_back();
+				throw error;
 			}
 		}
 
-		if((balance - (stock_price.back()*number)) < 0)
+		if((balance - (stock_price.back()*number)) < 0)//check if user has enough money
 		{
-			stock_name.pop_back();
+			stock_name.pop_back();//if not, get rid of these elements
 			number_shares.pop_back();
 			throw 1;
 		}
 
-		number_shares.push_back(number);
+		number_shares[i] = number;//set share number
+		balance -= number*stock_price[i];//update balance
 	}
 
-	stock_price.clear();
-	this->readstock_price();
-
-	for(i=0;i<stock_name.size();i++)
-	{
-		if(stock_name[i].compare(name) == 0)
-		{
-			balance -= number*stock_price[i];
-		}
-	}
-
-	update_user_file();
+	update_user_file();//update user file
 	return;
 }
 
