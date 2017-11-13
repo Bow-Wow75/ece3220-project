@@ -133,14 +133,6 @@ void Account::sellStocks()
 	stock_price.clear();//update stock values
 	this->readstock_price();
 
-	/*for(int i=0;i<stock_name.size();i++)
-	{
-		if(stock_name[i].compare(name) == 0)
-		{
-			balance += number*stock_price[i];
-		}
-	}*/
-
 	update_user_file();//update user file
 	return;
 }
@@ -209,7 +201,6 @@ void Account::buyStocks()
 		try{
 		stock_price.clear();
 		this->readstock_price();
-		//number_shares[i] = number;
 		}
 
 		catch(int error)
