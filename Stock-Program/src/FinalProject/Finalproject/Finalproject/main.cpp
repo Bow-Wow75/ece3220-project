@@ -64,7 +64,29 @@ void Account::sellStocks()
 	cout << "Enter name of stock to sell: " << endl;
 	cin >> name;
 	cout << "Enter the number of Stocks you would like to sell: " << endl;
-	cin >> number;
+
+	while(!(cin >> number)){
+		cin.clear();
+
+		while(cin.get() != '\n')
+			continue;
+
+			cout << "Invalid input.  Try again: ";
+	}
+
+	while(number <= 0)
+	{
+		cout << "Not a valid number of stocks" << endl << "Enter number of Stocks you would like to sell: " << endl;
+
+		while(!(cin >> number)){
+			cin.clear();
+
+			while(cin.get() != '\n')
+				continue;
+
+				cout << "Invalid input.  Try again: ";
+		}
+	}
 
 	for(int i=0;i<stock_name.size();i++)
 	{
@@ -141,7 +163,29 @@ void Account::buyStocks()
 	cout << "Enter name of stock to buy: " << endl;
 	cin >> name;
 	cout << "Enter the number of Stocks you would like to buy: " << endl;
-	cin >> number;
+
+	while(!(cin >> number)){
+		cin.clear();
+
+		while(cin.get() != '\n')
+			continue;
+
+			cout << "Invalid input.  Try again: ";
+	}
+
+	while(number <= 0)
+	{
+		cout << "Not a valid number of stocks" << endl << "Enter number of Stocks you would like to buy: " << endl;
+
+		while(!(cin >> number)){
+			cin.clear();
+
+			while(cin.get() != '\n')
+				continue;
+
+				cout << "Invalid input.  Try again: ";
+		}
+	}
 
 	int i;
 	for(i=0;i<stock_name.size();i++)//iterate until stock is found
@@ -171,12 +215,12 @@ void Account::buyStocks()
 
 		catch(int error)
 		{
-			if(error == 11)//runs if the stock doesn't exist in our market file
-			{
+			//runs if the stock doesn't exist in our market file
+				error = 11;
 				stock_name.pop_back();
 				number_shares.pop_back();
 				throw error;
-			}
+
 		}
 
 		if((balance - (stock_price.back()*number)) < 0)//check if user has enough money
@@ -453,6 +497,9 @@ void Account::menu(){
     	case 1: cout << "Not enough money in account" << endl;
     	break;
 
+    	case 11: cout << "Stock not found" << endl;
+    	break;
+
     	case 2: cout << "Not enough stocks to sell" << endl;
     	break;
 
@@ -521,6 +568,7 @@ void Account::login(){
     getline(cin, user_id);
     cout<<"Please enter in your password: "<<endl;
     getline(cin, password);
+
     
     this->locate_account( user_id ,password);
             incorrect = 2;
