@@ -452,9 +452,8 @@ void Account::menu(){
     {
         
     }
-    try{
     do{
-            
+    try{
     if( account_type == 5 )
         {
         cout<<"Select what you would like to do"<<endl
@@ -487,7 +486,6 @@ void Account::menu(){
                 
             }
         }
-    }while( choice != 5);
     }//for try statement
 
     catch(int menuError)
@@ -510,6 +508,7 @@ void Account::menu(){
     	break;
     	}
     }
+    }while( choice !=5 );
 }
 void Account:: locate_account(string entered_id, string entered_password ){
     int type;
