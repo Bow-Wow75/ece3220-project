@@ -7,7 +7,7 @@
 //
 
 
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles files very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
@@ -53,43 +53,7 @@ class Account{
         void setstockformarketcharge();
         void search_forstock(string stock); // will open available stocks and search for that stock in the folder
 };
-
-class Stock{
-private:
-
-protected:
-
-public:
-	double value;
-	std::string name;
-
-	void printStocks();
-	//constructor
-
-};
-
-
-class User{
-private:
-	double balance;
-	int id;
-	std::vector<Stock> stocks;
-	std::vector<int> stockNums;
-protected:
-
-public:
-};
-
-
-
-void printMenu();
-std::vector<Stock> loadStocks();
-
 //.........END HEADER........//
-
-
-
-
 //..........from Erik's functions........//
 
 void Account::sellStocks()
@@ -229,12 +193,6 @@ void Account::buyStocks()
 	update_user_file();//update user file
 	return;
 }
-
-
-void Stock::printStocks()
-{
-	cout << name << "  " << value << endl;
-}
 void Account::setstockformarketcharge(){
     string stock;
     string retry;
@@ -256,7 +214,7 @@ void Account::setstockformarketcharge(){
     {
         cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
     }
-    // a why of getting to the end of the file will need to be implemented
+    // a way of getting to the end of the file will need to be implemented
     {
         //input.seekg(0, ios::end);
         //int lenght = file.tellg();
@@ -275,8 +233,9 @@ void Account::setstockformarketcharge(){
 }
 void Account::search_forstock(string stock){
     double price;
-    int found = 0;
+    int found = 9;
     string name;
+    int i = 0;
 
     ifstream input;
     input.open("market_price.txt");
@@ -285,48 +244,31 @@ void Account::search_forstock(string stock){
         cout<<"error reading in market prices"<<endl;
     }
     //int total
-        while( !input.eof() || found != 0)
+        while( found != 0 )
         {
             input>>name;
             input>>price;
+            i++;
             if(stock.compare(name) == 0){
                 stock_price.push_back(price);
                 cout<<""<<name<<endl;
                 cout<<""<<price<<endl;
                 found = 0;
                 input.seekg(0, ios::beg);
+                input.close();
                 throw price;
             };
+            if( input.eof() )
+            {
+                input.clear();
+                input.seekg(0, ios::beg);
+                found = 0;
+                cout<<"Stock was not found: "<<stock <<endl;
+            }
             
-        }
+}
     input.close();
     
-}
-
-void Account:: loadstocks()
-{
-
-
-		ifstream inputFile;
-		inputFile.open("stocks.txt");
-		//int fileError = 0;
-
-		if(!inputFile)
-		{
-
-			cerr << "Unable to open file" << endl;
-			throw 0;
-		}
-
-		vector<Stock> availableStocks;
-		Stock temp;
-
-		while(inputFile >> temp.name >> temp.value)
-		{
-			availableStocks.push_back(temp);
-		}
-
-		inputFile.close();
 }
 
 void printMenu()
@@ -361,29 +303,7 @@ void Account::readstock_price(){
     {
         cout<<"error reading in market prices"<<endl;
     }
-
-    // new function accounts for all cases unlike the old
-    /*for( int i = 0; i < (stock_name.size()); i++){
-    	j=0;
-        
-        while( !input.eof() || found != 0)
-        {
-            input>>name;
-            input>>price;
-            if(stock_name[i].compare(name) == 0){
-                stock_price.push_back(price);
-                cout<<name<<endl;
-                cout<<price<<endl;
-
-                //cout<<""<<name<<endl;
-                //cout<<""<<price<<endl;
-                found = 0;
-                i++;
-                input.seekg(0, ios::beg);
-            }
-            
-        }*/
-    for( int i = 0; i < (stock_name.size()); i++){
+for( int i = 0; i < (stock_name.size()); i++){
        
     	found = 9;
        // input>>name;
@@ -409,7 +329,7 @@ void Account::readstock_price(){
                 input.seekg(0, ios::beg);
                 found = 0;
                 cout<<"Stock was not found: "<<stock_name[i]<<endl;
-                throw 11;
+                throw 9;
                 
 
             }
@@ -458,7 +378,7 @@ void Account::read_accountinfo(){
     this->readstock_price();
 }
 
-void Account::display_profolio(){
+void  Account::display_profolio(){
     
     int i;
     cout<<"Profolio for "<<account_id<<endl;
@@ -471,13 +391,11 @@ void Account::display_profolio(){
       //  cout << "test1" << endl;
         cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<" "<<stock_price[i]<<endl;
       //  cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<endl;
-
     }
-    
 }
 void Account::menu(){
     //User function
-    int choice;
+    int choice = 0;
     try{
     this->read_accountinfo();
     }
@@ -486,10 +404,15 @@ void Account::menu(){
     {
         cout<<"Error reading the users file"<<endl;
     }
-    try{
-
-    if( account_type == 5 )
+    catch( char prompt )
     {
+        
+    }
+    try{
+    do{
+            
+    if( account_type == 5 )
+        {
         cout<<"Select what you would like to do"<<endl
         <<"\t1: Buy stocks: "<<endl
         <<"\t2: Sell stocks: "<<endl
@@ -518,8 +441,9 @@ void Account::menu(){
             	break;
                 
                 
+            }
         }
-    }
+    }while( choice != 5);
     }//for try statement
 
     catch(int menuError)
@@ -539,9 +463,6 @@ void Account::menu(){
     	break;
     	}
     }
-    
-    
-    
 }
 void Account:: locate_account(string entered_id, string entered_password ){
     int type;
@@ -589,8 +510,6 @@ void Account::login(){
     string exit = "";
    try
     {
-
-
         do{
         if( incorrect == 2)
         {
@@ -617,8 +536,6 @@ void Account::login(){
     		cout << "Unable to open file" << endl;
     }
 }
-
-
 int main( int argc, char** argv){
     try{
         Account user;
