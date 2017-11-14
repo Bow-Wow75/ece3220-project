@@ -8,7 +8,7 @@
 
 
 #define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
-						////...........This is needed primarily because XCode handles files very oddly....../////////
+						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -362,6 +362,7 @@ void Account::readstock_price(){
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
+        throw 91;
     }
 for( int i = 0; i < (stock_name.size()); i++){
        
@@ -435,7 +436,14 @@ void Account::read_accountinfo(){
 
 
     input.close();
+    try{
     this->readstock_price();
+    }
+
+    catch(int marketValueError)
+    {
+    throw 2;
+    }
 }
 
 void  Account::display_profolio(){
@@ -462,7 +470,16 @@ void Account::menu(){
 
     catch( int reading_error)
     {
+    	if(reading_error == 0)
+    	{
         cout<<"Error reading the users file"<<endl;
+        return;
+    	}
+    	else
+    	{
+    		cout << "unable to update stock values" << endl;
+    		return;
+    	}
     }
     catch( char prompt )
     {
@@ -478,8 +495,16 @@ void Account::menu(){
         <<"\t3: Set stock to buy or sell: "<<endl
         <<"\t4: Display profolio: "<<endl
         <<"\t5: To Exit your profolio: "<<endl;
-        cin>>choice;
         
+        while(!(cin >> choice)){
+        			cin.clear();
+
+        			while(cin.get() != '\n')
+        				continue;
+
+        				cout << "Invalid input.  Try again: ";
+        		}
+
         switch( choice ){
         
             case 1: // Buy stock
@@ -518,6 +543,9 @@ void Account::menu(){
     	break;
 
     	case 21: cout << "Stock not found" << endl;
+    	break;
+
+    	case 91: cout << "Unable to load stock values" << endl;
     	break;
 
     	default: cout << "Unknown error has occurred" << endl;
@@ -596,8 +624,12 @@ void Account::login(){
     	if(error == 0)
         cout<<"login was successful"<<endl;
     	if(error == 1)
+    	{
     		cout << "Unable to open file" << endl;
+    		throw error;
+    	}
     }
+    return;
 }
 int main( int argc, char** argv){
     try{
@@ -613,4 +645,5 @@ int main( int argc, char** argv){
     {
         cout<<"Error opening the accounts file"<<endl;
     }
+    return 0;
 }
