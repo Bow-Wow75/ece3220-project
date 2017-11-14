@@ -7,7 +7,8 @@
 //
 
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+						////...........This is needed primarily because XCode handles files very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -39,6 +40,9 @@ class Account{
     public:
         Account();
         ~Account();
+        void sellStocks();
+        void update_user_file();
+        void buyStocks();
         void login();
         void locate_account(string entered_id, string entered_password );
         void menu();
@@ -88,6 +92,143 @@ std::vector<Stock> loadStocks();
 
 //..........from Erik's functions........//
 
+void Account::sellStocks()
+{
+	string name;
+	int number;
+	int check=0;
+	cout << "Enter name of stock to sell: " << endl;
+	cin >> name;
+	cout << "Enter the number of Stocks you would like to sell: " << endl;
+	cin >> number;
+
+	for(int i=0;i<stock_name.size();i++)
+	{
+		if(stock_name[i].compare(name)==0)//iterate until we find the stock that matches
+		{
+			if((number_shares[i]-number) < 0)//ensure we have enough stocks to sell
+			{
+				throw 2;
+			}
+			else if((number_shares[i]-number)==0)//delete the stock element if we sell them all
+			{
+				stock_name.erase(stock_name.begin()+i);
+				number_shares.erase(number_shares.begin()+i);
+				balance += number*stock_price[i];
+				check = 1;
+			}
+			else{//update stock numbers and balance
+			number_shares[i] -= number;
+			balance += number*stock_price[i];
+			check = 1;
+			}
+			break;
+		}
+	}
+
+	if(check == 0)//stock isn't found so throw error code
+	{
+		throw 21;
+	}
+
+	stock_price.clear();//update stock values
+	this->readstock_price();
+
+	update_user_file();//update user file
+	return;
+}
+
+void Account::update_user_file()
+{
+		  string filename;
+		    filename = "inputfiles/accounts/" +account_id + ".txt";
+
+
+
+
+		std::ofstream outputFile(filename.c_str());
+		int i = 0;
+
+		if (outputFile.is_open()) //if the file is open
+		    {
+
+			outputFile << balance << endl;
+
+		        for(i=0;i<stock_name.size();i++) //while the end of file is NOT reached
+		        {
+		            outputFile << stock_name[i] << " " << number_shares[i] << endl;
+		        }
+		        outputFile.close(); //closing the file
+		    }
+		    else
+		    	{
+		    	cout << "Unable to open file\n"; //if the file is not open output
+		    	return;
+	}
+
+
+}
+
+void Account::buyStocks()
+{
+	string name;
+	int number;
+	int check=0;
+	cout << "Enter name of stock to buy: " << endl;
+	cin >> name;
+	cout << "Enter the number of Stocks you would like to buy: " << endl;
+	cin >> number;
+
+	int i;
+	for(i=0;i<stock_name.size();i++)//iterate until stock is found
+	{
+		if(stock_name[i].compare(name)==0)
+		{
+			if((balance -(stock_price[i]*number)) < 0)//ensure user has enough money
+			{
+				throw 1;
+			}
+			number_shares[i] += number;//update share numbers
+			balance -= number*stock_price[i];
+			check = 1;
+			break;
+		}
+	}
+
+	if(check == 0)//this runs if this is the first time the user buys this companies stock
+	{
+		stock_name.push_back(name);
+		number_shares.push_back(0);//We don't want to give user the stocks until we know they have enough money
+
+		try{
+		stock_price.clear();
+		this->readstock_price();
+		}
+
+		catch(int error)
+		{
+			if(error == 11)//runs if the stock doesn't exist in our market file
+			{
+				stock_name.pop_back();
+				number_shares.pop_back();
+				throw error;
+			}
+		}
+
+		if((balance - (stock_price.back()*number)) < 0)//check if user has enough money
+		{
+			stock_name.pop_back();//if not, get rid of these elements
+			number_shares.pop_back();
+			throw 1;
+		}
+
+		number_shares[i] = number;//set share number
+		balance -= number*stock_price[i];//update balance
+	}
+
+	update_user_file();//update user file
+	return;
+}
 
 
 void Stock::printStocks()
@@ -244,6 +385,9 @@ void Account::readstock_price(){
         }*/
     for( int i = 0; i < (stock_name.size()); i++){
        
+    	found = 9;
+       // input>>name;
+        //input>>price;
         while( found != 0)
         {
             input>>name;
@@ -256,18 +400,24 @@ void Account::readstock_price(){
                 input.clear();
                 input.seekg(0, ios::beg);
                 found = 0;
+                input.seekg(0, ios::beg);//I added this because it was only going back to the top of the file when
+
             }
-            if( input.eof())
+            if( input.eof() && found == 9)
             {
                 input.clear();
                 input.seekg(0, ios::beg);
                 found = 0;
                 cout<<"Stock was not found: "<<stock_name[i]<<endl;
+                throw 11;
                 
+
             }
             
             
         }
+       // input.seekg(0, ios::beg);//I added this because it was only going back to the top of the file when
+        //we hit the end of file, but we need to look at stocks from top to bottom each time
         found = 9;
         //input.seekg(0, ios::beg);
         
@@ -278,7 +428,12 @@ void Account::readstock_price(){
 }
 void Account::read_accountinfo(){
     string filename;
+#if COMPILER == 0
     filename = account_id +".txt";
+#endif
+#if COMPILER == 1
+    filename = "inputfiles/accounts/" +account_id + ".txt";
+#endif
     int readFile_error = 0;
     string name;
     int number;
@@ -324,8 +479,15 @@ void Account::menu(){
     //User function
     int choice;
     try{
-        
     this->read_accountinfo();
+    }
+
+    catch( int reading_error)
+    {
+        cout<<"Error reading the users file"<<endl;
+    }
+    try{
+
     if( account_type == 5 )
     {
         cout<<"Select what you would like to do"<<endl
@@ -339,8 +501,10 @@ void Account::menu(){
         switch( choice ){
         
             case 1: // Buy stock
+            	buyStocks();
                 break;
             case 2: //Sell stock
+            	sellStocks();
                 break;
             case 3: // set stock to buy or sell
                 setstockformarketcharge();
@@ -350,14 +514,30 @@ void Account::menu(){
                 break;
             case 5:// implement a throw to exit the program
                 break; 
+            default:
+            	break;
                 
                 
         }
     }
-       }
-    catch( int reading_error)
+    }//for try statement
+
+    catch(int menuError)
     {
-        cout<<"Error reading the users file"<<endl;
+    	switch(menuError)
+    	{
+    	case 1: cout << "Not enough money in account" << endl;
+    	break;
+
+    	case 2: cout << "Not enough stocks to sell" << endl;
+    	break;
+
+    	case 21: cout << "Stock not found" << endl;
+    	break;
+
+    	default: cout << "Unknown error has occurred" << endl;
+    	break;
+    	}
     }
     
     
