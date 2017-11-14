@@ -7,7 +7,7 @@
 //
 
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles files very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
@@ -253,7 +253,15 @@ void Account::setstockformarketcharge(){
     catch( double price)
     {
     ofstream input;
+
+#if COMPILER == 1
+    input.open("inputfiles/set_to_sell_or_buy.txt");
+#endif
+
+#if COMPILER == 0
     input.open("set_to_sell_or_buy.txt");
+#endif
+
     if(!input.is_open())
     {
         cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
@@ -282,7 +290,15 @@ void Account::search_forstock(string stock){
     int i = 0;
 
     ifstream input;
+
+#if COMPILER == 0
     input.open("market_price.txt");
+#endif
+
+#if COMPILER == 1
+    input.open("inputfiles/market_price.txt");
+#endif
+
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
