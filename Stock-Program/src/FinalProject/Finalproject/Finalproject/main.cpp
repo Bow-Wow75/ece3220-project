@@ -37,15 +37,17 @@ class Account{
         vector<int> number_shares;
         vector<double> stock_price;
         vector<double> availableStocks;// erik
+    
     public:
-        Account();
-        ~Account();
+        Account(){};
+        Account(string user_id, string password, int type);
+        ~Account(){};
         void sellStocks();
         void update_user_file();
         void buyStocks();
         void login();
         void locate_account(string entered_id, string entered_password );
-        void menu();
+        virtual void menu();
         void display_profolio();
         void read_accountinfo();
         void readstock_price();
@@ -53,6 +55,57 @@ class Account{
         void setstockformarketcharge();
         void search_forstock(string stock); // will open available stocks and search for that stock in the folder
 };
+class Administrator: public Account {//extension of the case account class
+    
+private:
+    string admin_id;
+    string admin_password;
+    int admin_type;
+public:
+    Administrator(){};
+    Administrator(string user_id, string password, int type);
+    ~Administrator(){};
+    virtual void menu();
+};
+void Administrator:: menu()
+{
+    int choice = 0;
+    do{
+        if( admin_type == 1 )
+       {
+        cout<<"Select what you would like to do"<<endl
+        <<"\t1: See all accounts: "<<endl
+        <<"\t2: Create account: "<<endl
+        <<"\t3: Change user password: "<<endl
+        <<"\t4: Display a user profolio "<<endl
+        <<"\t5: To Exit your profolio: "<<endl;
+        cin>>choice;
+        
+        switch( choice ){
+                
+            case 1://See all accounts
+                break;
+            case 2:// Create account
+                break;
+            case 3://change user password or id
+                break;
+            case 4://Display users profolio
+                break;
+            case 5://exit
+                break;
+            default:
+                break;
+            }
+       }
+    }while( choice != 5);
+
+}
+Administrator::Administrator( string user_id, string password, int type)
+{
+    admin_id = user_id;
+    admin_password = password;
+    admin_type = type;
+}
 //.........END HEADER........//
 //..........from Erik's functions........//
 
@@ -253,18 +306,14 @@ void Account::setstockformarketcharge(){
     catch( double price)
     {
     ofstream input;
-    input.open("set_to_sell_or_buy.txt");
+        input.open("set_to_sell_or_buy.txt", ios::app);
     if(!input.is_open())
     {
         cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
     }
     // a way of getting to the end of the file will need to be implemented
-    {
-        //input.seekg(0, ios::end);
-        //int lenght = file.tellg();
-        //input.seekg(lenght, )
         input<<account_id<<" "<<stock<<" "<<price<<endl;
-    }
+    
         input.close();
     }
     cout<<"would you like to add another stock if so type yes"<<endl;
@@ -322,13 +371,6 @@ void printMenu()
 		 << "(3) Set Stock Seller Requirements" << endl
 		 << "(4) Account info: " << endl
 		 << "(5) Update account balance: " << endl;
-}
-Account::Account(){
-    
-}
-
-Account::~Account(){
-    
 }
 void Account::readstock_price(){
     
@@ -476,7 +518,7 @@ void Account::menu(){
                 setstockformarketcharge();
                 break;
             case 4:// display profolio
-                this->display_profolio();
+                display_profolio();
                 break;
             case 5:// implement a throw to exit the program
                 break; 
@@ -510,7 +552,7 @@ void Account::menu(){
     }
     }while( choice !=5 );
 }
-void Account:: locate_account(string entered_id, string entered_password ){
+void locate_account(string entered_id, string entered_password ){
     int type;
     int input_error = 1;
    string user_id, password;
@@ -539,25 +581,40 @@ void Account:: locate_account(string entered_id, string entered_password ){
         
         if( entered_id.compare(user_id) == 0){
             if( entered_password.compare(password)== 0 ){
-                account_id = user_id;
-                account_password = password;
-                account_type = type;
-                //cout<<"successful login"<<endl;
-                throw 0;// throws zero if correct
-            }
+               
+                if( type ==  5){//will create a user class
+                    Account user(user_id, password, type);
+                    user.menu();
+                }
+                
+                if( type == 1){
+                    Administrator user(user_id, password, type);
+                    user.menu();
+                }
+                
         }
         
     }
     input.close();
+        throw 0;
 }
-void Account::login(){
+
+}
+Account:: Account(string user_id, string password, int type){
+    account_id = user_id;
+    account_password = password;
+    account_type = type;
+    
+}
+void login(){
     string user_id; string password;
     int incorrect = 1;
     string exit = "";
-   try
-    {
-        do{
-        if( incorrect == 2)
+    do{
+       
+        try
+        {
+            if( incorrect == 2)
         {
             cout<<"Incorrect User ID or Password: try again"<<endl;
             cout<<"if you would like to exit type exit:  "<<endl;
@@ -567,30 +624,19 @@ void Account::login(){
     getline(cin, user_id);
     cout<<"Please enter in your password: "<<endl;
     getline(cin, password);
-
-    
-    this->locate_account( user_id ,password);
+    locate_account( user_id, password);//seeing if there information is there
             incorrect = 2;
+        }
+            catch( int no_loggin)
+        {
+            cout<<"Unsuccesful login"<<endl;
+        }
     }while( exit != "exit");
-      
-    }
     
-    catch( int error )
-    {
-    	if(error == 0)
-        cout<<"login was successful"<<endl;
-    	if(error == 1)
-    		cout << "Unable to open file" << endl;
-    }
 }
 int main( int argc, char** argv){
     try{
-        Account user;
-        user.login();
-        user.menu();
-        
-   
-    
+        login();
     }
     
     catch( int input_error)
