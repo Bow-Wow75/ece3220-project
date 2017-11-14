@@ -7,8 +7,8 @@
 //
 
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
-						////...........This is needed primarily because XCode handles files very oddly....../////////
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -306,6 +306,15 @@ void Account::setstockformarketcharge(){
     catch( double price)
     {
     ofstream input;
+
+#if COMPILER == 1
+    input.open("inputfiles/set_to_sell_or_buy.txt");
+#endif
+
+#if COMPILER == 0
+    input.open("set_to_sell_or_buy.txt");
+#endif
+
         input.open("set_to_sell_or_buy.txt", ios::app);
     if(!input.is_open())
     {
@@ -331,7 +340,15 @@ void Account::search_forstock(string stock){
     int i = 0;
 
     ifstream input;
+
+#if COMPILER == 0
     input.open("market_price.txt");
+#endif
+
+#if COMPILER == 1
+    input.open("inputfiles/market_price.txt");
+#endif
+
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
@@ -388,6 +405,7 @@ void Account::readstock_price(){
     if( !input.is_open())
     {
         cout<<"error reading in market prices"<<endl;
+        throw 91;
     }
 for( int i = 0; i < (stock_name.size()); i++){
        
@@ -458,7 +476,14 @@ void Account::read_accountinfo(){
 
 
     input.close();
+    try{
     this->readstock_price();
+    }
+
+    catch(int marketValueError)
+    {
+    throw 2;
+    }
 }
 
 void  Account::display_profolio(){
@@ -485,7 +510,16 @@ void Account::menu(){
 
     catch( int reading_error)
     {
+    	if(reading_error == 0)
+    	{
         cout<<"Error reading the users file"<<endl;
+        return;
+    	}
+    	else
+    	{
+    		cout << "unable to update stock values" << endl;
+    		return;
+    	}
     }
     catch( char prompt )
     {
@@ -501,8 +535,16 @@ void Account::menu(){
         <<"\t3: Set stock to buy or sell: "<<endl
         <<"\t4: Display profolio: "<<endl
         <<"\t5: To Exit your profolio: "<<endl;
-        cin>>choice;
         
+        while(!(cin >> choice)){
+        			cin.clear();
+
+        			while(cin.get() != '\n')
+        				continue;
+
+        				cout << "Invalid input.  Try again: ";
+        		}
+
         switch( choice ){
         
             case 1: // Buy stock
@@ -537,6 +579,9 @@ void Account::menu(){
     	break;
 
     	case 21: cout << "Stock not found" << endl;
+    	break;
+
+    	case 91: cout << "Unable to load stock values" << endl;
     	break;
 
     	default: cout << "Unknown error has occurred" << endl;
@@ -579,6 +624,7 @@ void locate_account(string entered_id, string entered_password ){
                     Account user(user_id, password, type);
                     input.close();
                     user.menu();
+
                     throw password;
                 }
                 
@@ -626,15 +672,32 @@ void login(){
         }
             catch( int no_loggin)
         {
-            cout<<"Unsuccesful login"<<endl;
+            	if(no_loggin == 1)
+            		cout<<"Unsuccesful login"<<endl;
+            if(no_loggin == -5)
+            	return;
         }
+
         catch(...)
         {
             cout<<"You have been logged out or your account"<<endl;
         }
         getline(cin, space);//used to take in the enter from the user otherwise skips the user i when exiting
+
     }while( exit != "exit");
-    
+
+
+  /*  catch( int error )
+    {
+    	if(error == 0)
+        cout<<"login was successful"<<endl;
+    	if(error == 1)
+    	{
+    		cout << "Unable to open file" << endl;
+    		throw error;
+    	}
+    }*/
+    return;
 }
 int main( int argc, char** argv){
     try{
@@ -645,4 +708,5 @@ int main( int argc, char** argv){
     {
         cout<<"Error opening the accounts file"<<endl;
     }
+    return 0;
 }
