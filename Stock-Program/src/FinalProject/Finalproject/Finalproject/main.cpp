@@ -237,16 +237,16 @@ void Stock::printStocks()
 }
 void Account::setstockformarketcharge(){
     string stock;
-
+    string retry;
     try{
-        // try block to determine is the stock is available
+      // try block to determine is the stock is available
     cout<<"Enter the name of the stock you would like to buy or sell"<<endl;
     cin>>stock;
     this->search_forstock(stock);
-        
+        cout<<"Sorry your stock can not be found"<<endl;
+        cout<<"Would you like to try again if so enter yes: "<<endl;
+        cin>>retry;
     }
-    
-    
     
     catch( double price)
     {
@@ -258,12 +258,19 @@ void Account::setstockformarketcharge(){
     }
     // a why of getting to the end of the file will need to be implemented
     {
-       // input.seekg(0, ios::end);
-        input<<""<<account_id<<""<<stock<<""<<price<<endl;
-        
+        //input.seekg(0, ios::end);
+        //int lenght = file.tellg();
+        //input.seekg(lenght, )
+        input<<account_id<<" "<<stock<<" "<<price<<endl;
     }
         input.close();
     }
+    cout<<"would you like to add another stock if so type yes"<<endl;
+            cin>>retry;
+            if(retry == "yes")
+            {
+                this->setstockformarketcharge();
+            }
     
 }
 void Account::search_forstock(string stock){
@@ -354,9 +361,9 @@ void Account::readstock_price(){
     {
         cout<<"error reading in market prices"<<endl;
     }
-   int j = 0;
-    //int total
-    /*for( int i = 0; i < (stock_name.size()); i++){//*****************************Use for layout for the search function******************************
+
+    // new function accounts for all cases unlike the old
+    /*for( int i = 0; i < (stock_name.size()); i++){
     	j=0;
         
         while( !input.eof() || found != 0)
@@ -388,8 +395,10 @@ void Account::readstock_price(){
             
             if(stock_name[i].compare(name) == 0){
                 stock_price.push_back(price);
-                cout<<""<<name<<endl;
-                cout<<""<<price<<endl;
+               // cout<<""<<name<<endl;
+                //cout<<""<<price<<endl;
+                input.clear();
+                input.seekg(0, ios::beg);
                 found = 0;
                 input.seekg(0, ios::beg);//I added this because it was only going back to the top of the file when
 
