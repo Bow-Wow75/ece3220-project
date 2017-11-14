@@ -1,6 +1,6 @@
 Amazon 500
 Netflix 193
-Beoing 1000
+Boing 1000
 AMD 23
 Intel 300
 Alphabet_Inc .04

@@ -26,6 +26,7 @@
 		E18E4E981FB509B6001F1E65 /* Finalproject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Finalproject; sourceTree = BUILT_PRODUCTS_DIR; };
 		E18E4E9B1FB509B6001F1E65 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E18E4EA21FB50BBC001F1E65 /* accounts.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = accounts.txt; path = inputfiles/accounts.txt; sourceTree = "<group>"; };
+		E199C78A1FBAA8D000B4C3E3 /* bow-wow.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "bow-wow.txt"; path = "inputfiles/bow-wow.txt"; sourceTree = "<group>"; };
 		E1A1CE471FB55BEE000CCE50 /* nabyq6.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = nabyq6.txt; path = inputfiles/nabyq6.txt; sourceTree = "<group>"; };
 		E1A1CE481FB5628C000CCE50 /* market_price.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = market_price.txt; path = inputfiles/market_price.txt; sourceTree = "<group>"; };
 		E1A1CE491FB6375D000CCE50 /* set_to_sell_or_buy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = set_to_sell_or_buy.txt; path = inputfiles/set_to_sell_or_buy.txt; sourceTree = "<group>"; };
@@ -62,8 +63,9 @@
 			isa = PBXGroup;
 			children = (
 				E18E4E9B1FB509B6001F1E65 /* main.cpp */,
-				E1A1CE471FB55BEE000CCE50 /* nabyq6.txt */,
 				E18E4EA21FB50BBC001F1E65 /* accounts.txt */,
+				E1A1CE471FB55BEE000CCE50 /* nabyq6.txt */,
+				E199C78A1FBAA8D000B4C3E3 /* bow-wow.txt */,
 				E1A1CE481FB5628C000CCE50 /* market_price.txt */,
 				E1A1CE491FB6375D000CCE50 /* set_to_sell_or_buy.txt */,
 			);
