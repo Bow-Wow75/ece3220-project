@@ -2,8 +2,7 @@
 //  main.cpp
 //  Finalproject
 //
-//  Created by Nicholas Bouckaert on 11/9/17.
-//  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
+//  Created by Erik Bowers and Nicholas Bouckaert
 //
 
 
@@ -433,9 +432,7 @@ for( int i = 0; i < (stock_name.size()); i++){
                 input.seekg(0, ios::beg);
                 found = 0;
                 cout<<"Stock was not found: "<<stock_name[i]<<endl;
-                throw 9;
-                
-
+                stock_price.push_back(00);
             }
             
             
@@ -468,12 +465,11 @@ void Account::read_accountinfo(){
         throw readFile_error;
     }
     input>>balance;
-    while(input >> name >> number)
+    while( !input.eof())
     {
-        //input>>name;
+        input>>name;
+        input>>number;
         stock_name.push_back(name);
-        
-        //input>>number;
         number_shares.push_back(number);
     }
 
@@ -508,7 +504,7 @@ void Account::menu(){
     //User function
     int choice = 0;
     try{
-    this->read_accountinfo();
+    read_accountinfo();
     }
 
     catch( int reading_error)
@@ -563,11 +559,7 @@ void Account::menu(){
                 display_profolio();
                 break;
             case 5:// implement a throw to exit the program
-                break; 
-            default:
-            	break;
-                
-                
+                break;
             }
         }
     }//for try statement
@@ -629,24 +621,26 @@ void locate_account(string entered_id, string entered_password ){
                
                 if( type ==  5){//will create a user class
                     Account user(user_id, password, type);
+                    input.close();
                     user.menu();
-                    throw -5;
+
+                    throw password;
                 }
                 
                 if( type == 1){
                     Administrator user(user_id, password, type);
+                    input.close();
                     user.menu();
-                    throw -5;
+                    throw password;
                 }
                 
-        }
+            }
         
-    }
+        }
     }
     input.close();
         throw 0;
 }
-
 Account:: Account(string user_id, string password, int type){
     account_id = user_id;
     account_password = password;
@@ -654,7 +648,7 @@ Account:: Account(string user_id, string password, int type){
     
 }
 void login(){
-    string user_id; string password;
+    string user_id; string password, space;
     int incorrect = 1;
     string exit = "";
     do{
@@ -667,6 +661,7 @@ void login(){
             cout<<"if you would like to exit type exit:  "<<endl;
             getline(cin, exit);
         }
+    cout<<"Welcome"<<endl;
     cout<<"Please enter in your user id: "<<endl;
     getline(cin, user_id);
     cout<<"Please enter in your password: "<<endl;
@@ -682,18 +677,11 @@ void login(){
             	return;
         }
 
-            catch( int error )
-            {
-            	if(error == 0)
-                cout<<"login was successful"<<endl;
-            	if(error == 1)
-            	{
-            		cout << "Unable to open file" << endl;
-            		throw error;
-            	}
-            	if(error == -5)
-            		return;
-            }
+        catch(...)
+        {
+            cout<<"You have been logged out or your account"<<endl;
+        }
+        getline(cin, space);//used to take in the enter from the user otherwise skips the user i when exiting
 
     }while( exit != "exit");
 
