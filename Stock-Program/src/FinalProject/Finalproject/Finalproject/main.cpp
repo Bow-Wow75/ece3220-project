@@ -2,8 +2,7 @@
 //  main.cpp
 //  Finalproject
 //
-//  Created by Nicholas Bouckaert on 11/9/17.
-//  Copyright © 2017 Nicholas Bouckaert. All rights reserved.
+//  Created by Erik Bowers and Nicholas Bouckaert
 //
 
 
