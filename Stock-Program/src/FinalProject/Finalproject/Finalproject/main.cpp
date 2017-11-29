@@ -7,7 +7,7 @@
 //
 
 
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
@@ -26,8 +26,14 @@
 using namespace std;
 
 string input_file = "accounts.txt";// stores the list of accounts for the program and their passwords
-
-class Account{
+class Log_in{
+public:
+    Log_in(){};
+    ~Log_in(){};
+    void login();
+    void locate_account(string entered_id, string entered_password );
+};
+class Account:public Log_in{
     protected:
         string account_id;
         string account_password;
@@ -45,8 +51,7 @@ class Account{
         void sellStocks();
         void update_user_file();
         void buyStocks();
-        void login();
-        void locate_account(string entered_id, string entered_password );
+        //void locate_account(string entered_id, string entered_password );
         virtual void menu();
         void display_profolio();
         void read_accountinfo();
@@ -66,10 +71,122 @@ public:
     Administrator(string user_id, string password, int type);
     ~Administrator(){};
     virtual void menu();
+    void change_password();
+    void create_account(int type);
+    virtual void display_all();
 };
+void Administrator:: change_password(){
+    string user_name,space;
+    string id, password, new_password;
+    int type;
+    
+    int error = 0;
+    getline( cin, space);
+    cout<<"Enter the name of the user whose was word needs to be change:"<<endl;
+    getline(cin, user_name);
+    try
+    {
+    fstream input;
+        input.open(input_file, ios::app);
+    if(!input.is_open())
+    {
+        throw error;
+    }
+        while(!input.eof())
+    {
+        input>>id;
+             if(user_name.compare(id) == 0)
+             {
+                 cout<<"Enter in your new password"<<endl;
+                 getline(cin, new_password);
+                 input<<new_password;//need to get this to work
+                 input.close();
+                 throw 21;
+             }
+        input>>password;
+        input>>type;
+    }
+        input.close();
+    }
+    catch( int error)
+        {
+        switch(error){
+                
+        case 0: cout<<"Unable to change password: try again if you would like"<<endl;
+                break;
+        case 21: cout<<"Password has been changed"<<endl;
+                break;
+        }
+    }
+    
+    
+}
+void Administrator:: create_account(int type){
+    string user_name, password;
+    string space;
+    try{
+        getline(cin, space);//take in the enter from the user and dont use
+        cout<<"Enter the User name you would like to use"<<endl;
+        getline(cin, user_name);
+        cout<<"Enter the password you would like to"<<endl;
+        getline(cin, password);
+
+    ofstream input;
+    input.open(input_file, ios::app);
+    if( !input.is_open() )
+    {
+        throw 0;
+    }
+    {
+        input<<user_name;
+        input<<" "<<password;
+        input<<" "<<type;
+    }
+        input.close();
+        
+    }
+    catch(...){
+        cout<<"error writing to the creating account"<<endl;
+    }
+}
+
+void Administrator:: display_all(){
+    string user_name, password;
+    int type;
+    
+    ifstream input;
+    input.open(input_file);
+    if( !input.is_open())
+    {
+        cout<<"error reading in market prices"<<endl;
+    }
+    cout<<"List of Accounts and account type"<<endl;
+    input>>user_name;
+    input>>password;
+    input>>type;
+   while( !input.eof())
+   {
+       if(type == 5 )
+    {
+        cout<<user_name<<" "<<"User"<<endl;
+    }
+       else{
+        cout<<user_name<<" "<<"Admin"<<endl;
+       }
+       input>>user_name;
+       input>>password;
+       input>>type;
+       
+   }
+    input.close();
+    cout<<"End of list of accounts"<<endl;
+    
+}
 void Administrator:: menu()
 {
+    string space;
     int choice = 0;
+try{
     do{
         if( admin_type == 1 )
        {
@@ -77,28 +194,45 @@ void Administrator:: menu()
         <<"\t1: See all accounts: "<<endl
         <<"\t2: Create account: "<<endl
         <<"\t3: Change user password: "<<endl
-        <<"\t4: Display a user profolio "<<endl
+        <<"\t4: Login with user profolio "<<endl
         <<"\t5: To Exit your profolio: "<<endl;
         cin>>choice;
         
         switch( choice ){
                 
             case 1://See all accounts
+                display_all();
                 break;
             case 2:// Create account
+                int type;
+                cout<<"what type account will this be:"<<endl
+                <<"1:admin"<<endl
+                <<"5:user"<<endl;
+                cin>>type;
+                create_account(type);
                 break;
             case 3://change user password or id
+                change_password();
                 break;
             case 4://Display users profolio
+                cout<<"Please have the client login"<<endl;;
+                getline(cin, space);
+                login();
                 break;
             case 5://exit
+                throw 0;
                 break;
             default:
                 break;
             }
        }
     }while( choice != 5);
-
+}
+    
+    catch(...){
+        cout<<"you have been logged out of your account"<<endl;
+    }
+    
 }
 Administrator::Administrator( string user_id, string password, int type)
 {
@@ -590,7 +724,7 @@ void Account::menu(){
     }
     }while( choice !=5 );
 }
-void locate_account(string entered_id, string entered_password ){
+void Log_in::locate_account(string entered_id, string entered_password ){
     int type;
     int input_error = 1;
    string user_id, password;
@@ -640,7 +774,7 @@ void locate_account(string entered_id, string entered_password ){
         }
     }
     input.close();
-        throw 0;
+        throw 1;
 }
 Account:: Account(string user_id, string password, int type){
     account_id = user_id;
@@ -648,7 +782,7 @@ Account:: Account(string user_id, string password, int type){
     account_type = type;
     
 }
-void login(){
+void Log_in:: login(){
     string user_id; string password, space;
     int incorrect = 1;
     string exit = "";
@@ -670,19 +804,21 @@ void login(){
     locate_account( user_id, password);//seeing if there information is there
             incorrect = 2;
         }
-            catch( int no_loggin)
-        {
-            	if(no_loggin == 1)
-            		cout<<"Unsuccesful login"<<endl;
-            if(no_loggin == -5)
-            	return;
-        }
-
-        catch(...)
+        
+       
+        catch(char password)
         {
             cout<<"You have been logged out or your account"<<endl;
+            getline(cin, space);//used to take in the enter from the user otherwise skips the user i when exiting
         }
-        getline(cin, space);//used to take in the enter from the user otherwise skips the user i when exiting
+        
+        catch( int no_loggin)
+        {
+            if(no_loggin == 1)
+                cout<<"Unsuccesful login"<<endl;
+            incorrect = 2;
+        }
+       
 
     }while( exit != "exit");
 
@@ -701,7 +837,8 @@ void login(){
 }
 int main( int argc, char** argv){
     try{
-        login();
+        Log_in user;
+        user.login();
     }
     
     catch( int input_error)
