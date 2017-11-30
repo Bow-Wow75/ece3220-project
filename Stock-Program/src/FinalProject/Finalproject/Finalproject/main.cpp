@@ -5,8 +5,10 @@
 //  Created by Erik Bowers and Nicholas Bouckaert
 //
 
+//......................COMPILE USING C++11 STANDARDS.........................//////
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 
 #define ACCOUNTS "accounts.txt"
@@ -41,7 +43,7 @@ class Account:public Log_in{
         vector<string> stock_name;
         vector<int> number_shares;
         vector<double> stock_price;
-        vector<double> availableStocks;// erik
+        vector<double> availableStocks;
     
     public:
         Account(){};
@@ -86,7 +88,8 @@ void Administrator:: change_password(){
     try
     {
     fstream input;
-        input.open(input_file, ios::app);
+        input.open(input_file, ios::app);           ///What does this do?  Please comment code. This
+        											//Update: this needs c++11 standard to compile
     if(!input.is_open())
     {
         throw error;
@@ -599,6 +602,22 @@ void Account::read_accountinfo(){
         throw readFile_error;
     }
     input>>balance;
+
+#if COMPILER == 1
+    while( input >> name >> number)
+    {
+        stock_name.push_back(name);
+        number_shares.push_back(number);
+    }
+#endif
+
+    /*Please comment when changing code like this.  It obviously doesn't work on linux and I wouldn't
+     * think it would work on Xcode either, but that needs error checked on it's own.  I added these flags so
+     * they can be error checked separately, but This will be graded using linux, not Xcode.
+     *
+     * Note: Using eof often fails especially if there is an empty line at the end of the file
+     */
+#if COMPILER == 0
     while( !input.eof())
     {
         input>>name;
@@ -606,6 +625,7 @@ void Account::read_accountinfo(){
         stock_name.push_back(name);
         number_shares.push_back(number);
     }
+#endif
 
 
     input.close();
