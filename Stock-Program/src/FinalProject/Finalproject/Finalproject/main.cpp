@@ -133,6 +133,24 @@ void Administrator:: create_account(int type){
         cout<<"Enter the password you would like to"<<endl;
         getline(cin, password);
 
+#if COMPILER == 1                                            //This was added because Xcode handles files in a manner that
+        													//No other compiler can. We also added a newline for the new user
+        ofstream output;
+           output.open("inputfiles/accounts.txt", ios::app);
+           if( !output.is_open() )
+           {
+               throw 0;
+           }
+           {
+        	   output << endl << user_name << " " << password << " " << type;
+           }
+               output.close();
+
+           }
+
+#endif
+
+#if COMPILER == 0                      //This code doesn't add a new line for the users so they will be in one line
     ofstream input;
     input.open(input_file, ios::app);
     if( !input.is_open() )
@@ -147,6 +165,8 @@ void Administrator:: create_account(int type){
         input.close();
         
     }
+#endif
+
     catch(...){
         cout<<"error writing to the creating account"<<endl;
     }
@@ -179,8 +199,8 @@ void Administrator:: display_all(){
  	 	 	 	 	 	 */
 
     while(input >> user_name >> password >> type)
-    {
-    	 if(type == 5 )
+    {												//We don't print the password because no one should have access to them
+    	 if(type == 5 )								//In production the passwords would be hashed or encrypted
     	    {
     	        cout<<user_name<<" "<<"User"<<endl;
     	    }
