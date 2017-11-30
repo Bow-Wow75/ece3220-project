@@ -51,9 +51,9 @@ class Account:public Log_in{
         Account(){};
         Account(string user_id, string password, int type);
         ~Account(){};
-        void sellStocks();
+        void sellStocks(string name, int number);
         void update_user_file();
-        void buyStocks();
+        void buyStocks(string name, int number);
         //void locate_account(string entered_id, string entered_password );
         virtual void menu();
         void display_profolio();
@@ -92,13 +92,15 @@ void Administrator::backgroundUpdate()
 	int numStocks = 0;
 	double price = 0;
 	int action = 0;
+	string account_id;
+	string stock_name;
 
 	while(exit != -1)
 	{
 	cin >> exit;
 	usleep(SLEEPTIME*1000000);//usleep takes in microseconds
 
-		while(input >> account_id >> stock_name >> numStocks >> price >> action )
+		while(input >> account_id >> stock_name >> numStocks >> price >> action)
 		{
 			//The buy/sell functions will need modified to take the name and number as arguments instead of asking for them
 			if(action == 1){
@@ -345,23 +347,9 @@ Administrator::Administrator( string user_id, string password, int type)
 //.........END HEADER........//
 //..........from Erik's functions........//
 
-void Account::sellStocks()
+void Account::sellStocks(string name, int number)
 {
-	string name;
-	int number;
-	int check=0;
-	cout << "Enter name of stock to sell: " << endl;
-	cin >> name;
-	cout << "Enter the number of Stocks you would like to sell: " << endl;
-
-	while(!(cin >> number)){
-		cin.clear();
-
-		while(cin.get() != '\n')
-			continue;
-
-			cout << "Invalid input.  Try again: ";
-	}
+int check = 0;
 
 	while(number <= 0)
 	{
@@ -444,23 +432,9 @@ void Account::update_user_file()
 
 }
 
-void Account::buyStocks()
+void Account::buyStocks(string name, int number)
 {
-	string name;
-	int number;
-	int check=0;
-	cout << "Enter name of stock to buy: " << endl;
-	cin >> name;
-	cout << "Enter the number of Stocks you would like to buy: " << endl;
-
-	while(!(cin >> number)){
-		cin.clear();
-
-		while(cin.get() != '\n')
-			continue;
-
-			cout << "Invalid input.  Try again: ";
-	}
+int check = 0;
 
 	while(number <= 0)
 	{
@@ -925,11 +899,43 @@ void Account::menu(){
         switch( choice ){
         
             case 1: // Buy stock
-            	buyStocks();
+            {
+            	string name;
+            	int number;
+            	cout << "Enter name of stock to buy: " << endl;
+            	cin >> name;
+            	cout << "Enter the number of Stocks you would like to buy: " << endl;
+
+            	while(!(cin >> number)){
+            		cin.clear();
+
+            		while(cin.get() != '\n')
+            			continue;
+
+            			cout << "Invalid input.  Try again: ";
+            	}
+            	buyStocks(name, number);
                 break;
+            }
             case 2: //Sell stock
-            	sellStocks();
+            {
+            	string name;
+            	int number;
+            	cout << "Enter name of stock to sell: " << endl;
+            	cin >> name;
+            	cout << "Enter the number of Stocks you would like to sell: " << endl;
+
+            	while(!(cin >> number)){
+            		cin.clear();
+
+            		while(cin.get() != '\n')
+            			continue;
+
+            			cout << "Invalid input.  Try again: ";
+            	}
+            	sellStocks(name, number);
                 break;
+            }
             case 3: // set stock to buy or sell
                 setstockformarketcharge();
                 break;
