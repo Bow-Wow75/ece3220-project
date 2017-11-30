@@ -10,6 +10,7 @@
 
 #define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
+#define SLEEPTIME 20  //in seconds
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -23,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <string.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -75,7 +77,48 @@ public:
     void change_password();
     void create_account(int type);
     virtual void display_all();
+    void backgroundUpdate();
 };
+
+void Administrator::backgroundUpdate()
+{
+	ifstream input;
+	input.open("inputfiles/set_to_sell_or_buy.txt");
+
+	int exit = 0;
+	cout << "Enter -1 to exit auto update mode" << endl;
+	cin >> exit;
+
+	int numStocks = 0;
+	double price = 0;
+	int action = 0;
+
+	while(exit != -1)
+	{
+	cin >> exit;
+	usleep(SLEEPTIME*1000000);//usleep takes in microseconds
+
+		while(input >> account_id >> stock_name >> numStocks >> price >> action )
+		{
+			//The buy/sell functions will need modified to take the name and number as arguments instead of asking for them
+			if(action == 1){
+				//buy function
+
+			}
+			if(action == 2)
+			{
+				//sell function
+			}
+
+		}
+
+	}
+
+
+	return;
+
+}
+
 void Administrator:: change_password(){
     string user_name,space;
     string id, password, new_password;
@@ -248,7 +291,8 @@ try{
         <<"\t2: Create account: "<<endl
         <<"\t3: Change user password: "<<endl
         <<"\t4: Login with user profolio "<<endl
-        <<"\t5: To Exit your profolio: "<<endl;
+        <<"\t5: To Exit your profolio: "<<endl
+        <<"\t6: Run program in background for auto buy/sell" << endl;
         cin>>choice;
         
         switch( choice ){
@@ -275,6 +319,9 @@ try{
             case 5://exit
                 throw 0;
                 break;
+            case 6://Run sleep/background updating
+            	backgroundUpdate();
+            	break;
             default:
                 break;
             }
@@ -480,6 +527,8 @@ void Account::buyStocks()
 void Account::setstockformarketcharge(){
     string stock;
     string retry;
+
+#if COMPILER == 0
     try{
       // try block to determine is the stock is available
     cout<<"Enter the name of the stock you would like to buy or sell"<<endl;
@@ -489,20 +538,141 @@ void Account::setstockformarketcharge(){
         cout<<"Would you like to try again if so enter yes: "<<endl;
         cin>>retry;
     }
+#endif
+
+
+
+
+#if COMPILER == 1
+
+      // try block to determine is the stock is available
+
+    	double priceSet = 0;
+    	int action = 0;
+    	int number = 0;
+    	cout << "Enter (1) to buy or (2) to sell: " << endl;
+    	cin >> action;
+
+    	if(action == 1)
+    	{
+    	    cout<<"Enter the name of the stock you would like to buy: "<<endl;
+    	    cin>>stock;
+
+    	    cout << endl << "Enter the max price that you would like to buy that stock for: " << endl;
+    	    cin >> priceSet;
+
+    	    cout << endl << "How many stocks would you like to buy at/below this price?" << endl;
+    	    cin >> number;
+
+    	}
+
+    	else if(action == 2)
+    	{
+    	    cout<<"Enter the name of the stock you would like to sell: "<<endl;
+    	    cin>>stock;
+
+    	    cout << endl << "Enter the minimum price that you would like to sell that stock for: " << endl;
+    	    cin >> priceSet;
+
+    	    cout << endl << "How many stocks would you like to sell at/above this price?" << endl;
+    	    cin >> number;
+
+    	}
+    	else
+    		cout << "Invalid number entered" << endl;
+
+try{
+    this->search_forstock(stock);
+        cout<<"Sorry your stock can not be found"<<endl;
+        cout<<"Would you like to try again if so enter yes: "<<endl;
+        cin>>retry;
+    }
     
-    catch( double price)
+#endif
+
+
+
+
+#if COMPILER == 1
+catch(double price){
+//There isn't anything needed to do with this
+}
+	ofstream output;
+	output.open("inputfiles/set_to_sell_or_buy.txt", ios::app);
+
+    if(!output.is_open())
+    {
+        cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
+        //This doesn't exit when there's an error. Will it need to?
+    }
+    // a way of getting to the end of the file will need to be implemented
+        output<<account_id<<" "<<stock<<" "<<number<<" "<<priceSet<<" "<<action<<endl;
+
+        output.close();
+//bracket was here
+
+
+#endif
+
+
+
+#if COMPILER == 0
+    catch( double price)         //Is using a catch when there isn't an error appropriate? Wouldn't return work better?
     {
     ofstream input;
 
 #if COMPILER == 1
-    input.open("inputfiles/set_to_sell_or_buy.txt");
+    input.open("inputfiles/set_to_sell_or_buy.txt", ios::app);
 #endif
+
+
+
 
 #if COMPILER == 0
-    input.open("set_to_sell_or_buy.txt");
-#endif
+    //input.open("set_to_sell_or_buy.txt");              //I'm assuming this isn't needed twice
+
 
         input.open("set_to_sell_or_buy.txt", ios::app);
+#endif
+
+
+
+
+
+
+        if(!input.is_open())
+        {
+            cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
+            //This doesn't exit when there's an error. Will it need to?
+        }
+        // a way of getting to the end of the file will need to be implemented
+            input<<account_id<<" "<<stock<<" "<<price<<endl;
+
+            input.close();
+        }
+#endif
+
+
+
+
+
+/*
+#if COMPILER == 1
+        cout<<"would you like to add another stock if so type yes"<<endl;
+                cin>>retry;
+                if(retry == "yes")
+                {
+                    this->setstockformarketcharge();
+                }
+#endif
+*/
+
+
+
+
+
+
+#if COMPILER == 0                             //This won't work with the sleep() function
     if(!input.is_open())
     {
         cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
@@ -518,6 +688,7 @@ void Account::setstockformarketcharge(){
             {
                 this->setstockformarketcharge();
             }
+#endif
     
 }
 void Account::search_forstock(string stock){

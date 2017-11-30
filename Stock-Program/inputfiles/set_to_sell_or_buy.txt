@@ -1,0 +1,2 @@
+bow-wow AMD 5 20 1
+bow-wow Intel 2 200 1
