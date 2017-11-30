@@ -88,7 +88,7 @@ void Administrator:: change_password(){
     try
     {
     fstream input;
-        input.open(input_file, ios::app);           ///What does this do?  Please comment code. This
+        input.open(input_file, ios::app);           ///What does this do?
         											//Update: this needs c++11 standard to compile
     if(!input.is_open())
     {
@@ -611,7 +611,7 @@ void Account::read_accountinfo(){
     }
 #endif
 
-    /*Please comment when changing code like this.  It obviously doesn't work on linux and I wouldn't
+    /*Comment in future.  This doesn't work on linux and I wouldn't
      * think it would work on Xcode either, but that needs error checked on it's own.  I added these flags so
      * they can be error checked separately, but This will be graded using linux, not Xcode.
      *
@@ -674,7 +674,7 @@ void Account::menu(){
     		return;
     	}
     }
-    catch( char prompt )
+    catch( char prompt )//What is this doing?  Please comment.
     {
         
     }
@@ -785,7 +785,7 @@ void Log_in::locate_account(string entered_id, string entered_password ){
                     Administrator user(user_id, password, type);
                     input.close();
                     user.menu();
-                    throw password;
+                    throw password; //Why are we throwing password?  Comment?
                 }
                 
             }
@@ -820,7 +820,7 @@ void Log_in:: login(){
     getline(cin, user_id);
     cout<<"Please enter in your password: "<<endl;
     getline(cin, password);
-    locate_account( user_id, password);//seeing if there information is there
+    locate_account( user_id, password);//seeing if their information is there
             incorrect = 2;
         }
         
@@ -839,7 +839,7 @@ void Log_in:: login(){
         }
        
 
-    }while( exit != "exit");
+    }while( exit != "exit");   //This doesn't work.  Needs error checked..
 
 
   /*  catch( int error )
