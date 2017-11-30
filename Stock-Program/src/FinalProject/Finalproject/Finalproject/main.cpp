@@ -102,11 +102,13 @@ void Administrator::backgroundUpdate()
 		{
 			//The buy/sell functions will need modified to take the name and number as arguments instead of asking for them
 			if(action == 1){
+				//update current stock value
 				//buy function
 
 			}
 			if(action == 2)
 			{
+				//update current stock value
 				//sell function
 			}
 
