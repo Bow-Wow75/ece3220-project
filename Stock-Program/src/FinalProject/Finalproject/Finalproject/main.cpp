@@ -157,12 +157,42 @@ void Administrator:: display_all(){
     int type;
     
     ifstream input;
+
+#if COMPILER == 1
+    input.open("inputfiles/accounts.txt");
+#endif
+
+#if COMPILER == 0
     input.open(input_file);
-    if( !input.is_open())
+#endif
+
+
+    if( !input.is_open())//This doesn't seem to work
     {
-        cout<<"error reading in market prices"<<endl;
+        cout<<"Unable to open accounts file"<<endl;
     }
-    cout<<"List of Accounts and account type"<<endl;
+    cout<<"List of Accounts and account type"<<endl << endl;
+
+#if COMPILER == 1         /*I wrote this because the code below started an output loop. On linux at least. There are no comments
+							so I don't really know how you tried to implement it or if you error checked it
+
+ 	 	 	 	 	 	 */
+
+    while(input >> user_name >> password >> type)
+    {
+    	 if(type == 5 )
+    	    {
+    	        cout<<user_name<<" "<<"User"<<endl;
+    	    }
+    	 else{
+    		 cout<<user_name<<" "<<"Admin"<<endl;
+    	 }
+    }
+
+#endif
+
+#if COMPILER == 0                 //Was this error checked?  I rewrote the function above in a more concise manner
+    								//but left this because it might work on XCode? On linux this results in an output loop.
     input>>user_name;
     input>>password;
     input>>type;
@@ -180,8 +210,9 @@ void Administrator:: display_all(){
        input>>type;
        
    }
+#endif
     input.close();
-    cout<<"End of list of accounts"<<endl;
+    cout << endl <<"End of list of accounts"<<endl;
     
 }
 void Administrator:: menu()
