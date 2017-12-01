@@ -10,7 +10,7 @@
 
 #define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
-#define SLEEPTIME 20  //in seconds
+#define SLEEPTIME 5  //in seconds
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -62,6 +62,8 @@ class Account:public Log_in{
         void loadstocks();// may use later in the code
         void setstockformarketcharge();
         void search_forstock(string stock); // will open available stocks and search for that stock in the folder
+        void checkBackgroundUpdate(string stock_name, int numStocks, double price, int action);
+
 };
 class Administrator: public Account {//extension of the case account class
     
@@ -80,6 +82,51 @@ public:
     void backgroundUpdate();
 };
 
+void Account::checkBackgroundUpdate(string NewStock, int numStocks, double price, int action)
+{
+	this->read_accountinfo();
+	this->readstock_price();
+
+
+	int i = 0;
+/*	for(i=0; stock_name.size();i++)
+	{
+		cout << stock_name[i] << endl;
+	}
+	*/
+
+	for(i=0;i<stock_name.size();i++)//iterate until stock is found
+	{
+		if(action == 1)
+		{
+		if(stock_name[i].compare(NewStock)==0)
+		{
+			//cout << "Cost:" << stock_price[i] << endl;
+			if(stock_price[i] <= price)
+		{
+				cout << account_id << " buying " << numStocks  << " "<< NewStock << " stocks for " << stock_price[i]<< endl;
+			buyStocks(NewStock, numStocks);
+		}
+			break;
+		}
+		}
+
+		if(action == 2)
+		{
+			if(stock_name[i].compare(NewStock)==0)
+			{
+				if(stock_price[i] >= price)
+		{
+				sellStocks(NewStock, numStocks);
+		}
+				break;
+			}
+
+		}
+	}
+
+}
+
 void Administrator::backgroundUpdate()
 {
 	ifstream input;
@@ -87,7 +134,7 @@ void Administrator::backgroundUpdate()
 
 	int exit = 0;
 	cout << "Enter -1 to exit auto update mode" << endl;
-	cin >> exit;
+	//cin >> exit;
 
 	int numStocks = 0;
 	double price = 0;
@@ -97,24 +144,24 @@ void Administrator::backgroundUpdate()
 
 	while(exit != -1)
 	{
-	cin >> exit;
-	usleep(SLEEPTIME*1000000);//usleep takes in microseconds
+//	cin >> exit;
+	sleep(SLEEPTIME);//sleep takes in seconds
 
+
+//		this->readstock_price();//I don't know why "this->" is needed
 		while(input >> account_id >> stock_name >> numStocks >> price >> action)
 		{
+			Account temp(account_id, "password", 5);
 			//The buy/sell functions will need modified to take the name and number as arguments instead of asking for them
-			if(action == 1){
-				//update current stock value
-				//buy function
 
-			}
-			if(action == 2)
-			{
-				//update current stock value
-				//sell function
-			}
+
+				temp.checkBackgroundUpdate(stock_name, numStocks, price, action);
+
+
 
 		}
+		input.clear();          ///These ensure we go back to the top of the file
+		input.seekg(0, ios::beg);
 
 	}
 
