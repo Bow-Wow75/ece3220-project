@@ -5,9 +5,12 @@
 //  Created by Erik Bowers and Nicholas Bouckaert
 //
 
+//......................COMPILE USING C++11 STANDARDS.........................//////
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
+#define SLEEPTIME 5  //in seconds
 
 #define ACCOUNTS "accounts.txt"
 #define STOCKS "stocks.txt"
@@ -21,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <string.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -41,15 +45,15 @@ class Account:public Log_in{
         vector<string> stock_name;
         vector<int> number_shares;
         vector<double> stock_price;
-        vector<double> availableStocks;// erik
+        vector<double> availableStocks;
     
     public:
         Account(){};
         Account(string user_id, string password, int type);
         ~Account(){};
-        void sellStocks();
+        void sellStocks(string name, int number);
         void update_user_file();
-        void buyStocks();
+        void buyStocks(string name, int number);
         //void locate_account(string entered_id, string entered_password );
         virtual void menu();
         void display_profolio();
@@ -58,6 +62,8 @@ class Account:public Log_in{
         void loadstocks();// may use later in the code
         void setstockformarketcharge();
         void search_forstock(string stock); // will open available stocks and search for that stock in the folder
+        int checkBackgroundUpdate(string stock_name, int numStocks, double price, int action);
+
 };
 class Administrator: public Account {//extension of the case account class
     
@@ -73,7 +79,118 @@ public:
     void change_password();
     void create_account(int type);
     virtual void display_all();
+    void backgroundUpdate();
 };
+
+int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price, int action)
+{
+	this->read_accountinfo();
+	this->readstock_price();
+
+
+	int i = 0;
+/*	for(i=0; stock_name.size();i++)
+	{
+		cout << stock_name[i] << endl;
+	}
+	*/
+
+	for(i=0;i<stock_name.size();i++)//iterate until stock is found
+	{
+		if(action == 1)
+		{
+		if(stock_name[i].compare(NewStock)==0)
+		{
+			//cout << "Cost:" << stock_price[i] << endl;
+			if(stock_price[i] <= price)
+		{
+				cout << account_id << " buying " << numStocks  << " "<< NewStock << " stocks for " << stock_price[i]<< endl;
+			buyStocks(NewStock, numStocks);
+			return 1;
+		}
+			break;
+		}
+		}
+
+		if(action == 2)
+		{
+			if(stock_name[i].compare(NewStock)==0)
+			{
+				if(stock_price[i] >= price)
+		{
+				sellStocks(NewStock, numStocks);
+				return 1;
+		}
+				break;
+			}
+
+		}
+	}
+	return 0;
+
+}
+
+void Administrator::backgroundUpdate()
+{
+//	ifstream input;
+//	input.open("inputfiles/set_to_sell_or_buy.txt");
+
+	int exit = 0;
+	cout << "ctrl c to exit" << endl;
+	//cin >> exit;
+
+	int numStocks = 0;
+	double price = 0;
+	int action = 0;
+	string account_id;
+	string stock_name;
+
+	while(exit != -1)
+	{
+//	cin >> exit;
+	sleep(SLEEPTIME);//sleep takes in seconds
+
+	ifstream input;
+	input.open("inputfiles/set_to_sell_or_buy.txt");
+
+	ofstream outputTemp;
+	outputTemp.open("inputfiles/temp.txt", ios::app);
+
+//		this->readstock_price();//I don't know why "this->" is needed
+		while(input >> account_id >> stock_name >> numStocks >> price >> action)
+		{
+			Account temp(account_id, "password", 5);
+			//The buy/sell functions will need modified to take the name and number as arguments instead of asking for them
+
+
+				if(temp.checkBackgroundUpdate(stock_name, numStocks, price, action) == 0)
+				{
+					outputTemp << account_id << " " << stock_name << " " << numStocks << " " << price << " " << action << endl;
+				}
+				else
+				{
+
+				}
+
+
+
+		}
+
+		outputTemp.close();
+		input.close();
+	    remove("inputfiles/set_to_sell_or_buy.txt");
+	    rename("inputfiles/temp.txt","inputfiles/set_to_sell_or_buy.txt");
+
+	//	input.clear();          ///These ensure we go back to the top of the file
+	//	input.seekg(0, ios::beg);
+
+	}
+
+
+	return;
+
+}
+
 void Administrator:: change_password(){
     string user_name,space;
     string id, password, new_password;
@@ -86,7 +203,8 @@ void Administrator:: change_password(){
     try
     {
     fstream input;
-        input.open(input_file, ios::app);
+        input.open(input_file, ios::app);           ///What does this do?
+        											//Update: this needs c++11 standard to compile
     if(!input.is_open())
     {
         throw error;
@@ -130,6 +248,24 @@ void Administrator:: create_account(int type){
         cout<<"Enter the password you would like to"<<endl;
         getline(cin, password);
 
+#if COMPILER == 1                                            //This was added because Xcode handles files in a manner that
+        													//No other compiler can. We also added a newline for the new user
+        ofstream output;
+           output.open("inputfiles/accounts.txt", ios::app);
+           if( !output.is_open() )
+           {
+               throw 0;
+           }
+           {
+        	   output << endl << user_name << " " << password << " " << type;
+           }
+               output.close();
+
+           }
+
+#endif
+
+#if COMPILER == 0                      //This code doesn't add a new line for the users so they will be in one line
     ofstream input;
     input.open(input_file, ios::app);
     if( !input.is_open() )
@@ -144,6 +280,8 @@ void Administrator:: create_account(int type){
         input.close();
         
     }
+#endif
+
     catch(...){
         cout<<"error writing to the creating account"<<endl;
     }
@@ -154,12 +292,42 @@ void Administrator:: display_all(){
     int type;
     
     ifstream input;
+
+#if COMPILER == 1
+    input.open("inputfiles/accounts.txt");
+#endif
+
+#if COMPILER == 0
     input.open(input_file);
-    if( !input.is_open())
+#endif
+
+
+    if( !input.is_open())//This doesn't seem to work
     {
-        cout<<"error reading in market prices"<<endl;
+        cout<<"Unable to open accounts file"<<endl;
     }
-    cout<<"List of Accounts and account type"<<endl;
+    cout<<"List of Accounts and account type"<<endl << endl;
+
+#if COMPILER == 1         /*I wrote this because the code below started an output loop. On linux at least. There are no comments
+							so I don't really know how you tried to implement it or if you error checked it
+
+ 	 	 	 	 	 	 */
+
+    while(input >> user_name >> password >> type)
+    {												//We don't print the password because no one should have access to them
+    	 if(type == 5 )								//In production the passwords would be hashed or encrypted
+    	    {
+    	        cout<<user_name<<" "<<"User"<<endl;
+    	    }
+    	 else{
+    		 cout<<user_name<<" "<<"Admin"<<endl;
+    	 }
+    }
+
+#endif
+
+#if COMPILER == 0                 //Was this error checked?  I rewrote the function above in a more concise manner
+    								//but left this because it might work on XCode? On linux this results in an output loop.
     input>>user_name;
     input>>password;
     input>>type;
@@ -177,8 +345,9 @@ void Administrator:: display_all(){
        input>>type;
        
    }
+#endif
     input.close();
-    cout<<"End of list of accounts"<<endl;
+    cout << endl <<"End of list of accounts"<<endl;
     
 }
 void Administrator:: menu()
@@ -194,7 +363,8 @@ try{
         <<"\t2: Create account: "<<endl
         <<"\t3: Change user password: "<<endl
         <<"\t4: Login with user profolio "<<endl
-        <<"\t5: To Exit your profolio: "<<endl;
+        <<"\t5: To Exit your profolio: "<<endl
+        <<"\t6: Run program in background for auto buy/sell" << endl;
         cin>>choice;
         
         switch( choice ){
@@ -221,6 +391,9 @@ try{
             case 5://exit
                 throw 0;
                 break;
+            case 6://Run sleep/background updating
+            	backgroundUpdate();
+            	break;
             default:
                 break;
             }
@@ -242,23 +415,9 @@ Administrator::Administrator( string user_id, string password, int type)
 //.........END HEADER........//
 //..........from Erik's functions........//
 
-void Account::sellStocks()
+void Account::sellStocks(string name, int number)
 {
-	string name;
-	int number;
-	int check=0;
-	cout << "Enter name of stock to sell: " << endl;
-	cin >> name;
-	cout << "Enter the number of Stocks you would like to sell: " << endl;
-
-	while(!(cin >> number)){
-		cin.clear();
-
-		while(cin.get() != '\n')
-			continue;
-
-			cout << "Invalid input.  Try again: ";
-	}
+int check = 0;
 
 	while(number <= 0)
 	{
@@ -341,23 +500,9 @@ void Account::update_user_file()
 
 }
 
-void Account::buyStocks()
+void Account::buyStocks(string name, int number)
 {
-	string name;
-	int number;
-	int check=0;
-	cout << "Enter name of stock to buy: " << endl;
-	cin >> name;
-	cout << "Enter the number of Stocks you would like to buy: " << endl;
-
-	while(!(cin >> number)){
-		cin.clear();
-
-		while(cin.get() != '\n')
-			continue;
-
-			cout << "Invalid input.  Try again: ";
-	}
+int check = 0;
 
 	while(number <= 0)
 	{
@@ -426,6 +571,8 @@ void Account::buyStocks()
 void Account::setstockformarketcharge(){
     string stock;
     string retry;
+
+#if COMPILER == 0
     try{
       // try block to determine is the stock is available
     cout<<"Enter the name of the stock you would like to buy or sell"<<endl;
@@ -435,20 +582,141 @@ void Account::setstockformarketcharge(){
         cout<<"Would you like to try again if so enter yes: "<<endl;
         cin>>retry;
     }
+#endif
+
+
+
+
+#if COMPILER == 1
+
+      // try block to determine is the stock is available
+
+    	double priceSet = 0;
+    	int action = 0;
+    	int number = 0;
+    	cout << "Enter (1) to buy or (2) to sell: " << endl;
+    	cin >> action;
+
+    	if(action == 1)
+    	{
+    	    cout<<"Enter the name of the stock you would like to buy: "<<endl;
+    	    cin>>stock;
+
+    	    cout << endl << "Enter the max price that you would like to buy that stock for: " << endl;
+    	    cin >> priceSet;
+
+    	    cout << endl << "How many stocks would you like to buy at/below this price?" << endl;
+    	    cin >> number;
+
+    	}
+
+    	else if(action == 2)
+    	{
+    	    cout<<"Enter the name of the stock you would like to sell: "<<endl;
+    	    cin>>stock;
+
+    	    cout << endl << "Enter the minimum price that you would like to sell that stock for: " << endl;
+    	    cin >> priceSet;
+
+    	    cout << endl << "How many stocks would you like to sell at/above this price?" << endl;
+    	    cin >> number;
+
+    	}
+    	else
+    		cout << "Invalid number entered" << endl;
+
+try{
+    this->search_forstock(stock);
+        cout<<"Sorry your stock can not be found"<<endl;
+        cout<<"Would you like to try again if so enter yes: "<<endl;
+        cin>>retry;
+    }
     
-    catch( double price)
+#endif
+
+
+
+
+#if COMPILER == 1
+catch(double price){
+//There isn't anything needed to do with this
+}
+	ofstream output;
+	output.open("inputfiles/set_to_sell_or_buy.txt", ios::app);
+
+    if(!output.is_open())
+    {
+        cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
+        //This doesn't exit when there's an error. Will it need to?
+    }
+    // a way of getting to the end of the file will need to be implemented
+        output<<account_id<<" "<<stock<<" "<<number<<" "<<priceSet<<" "<<action<<endl;
+
+        output.close();
+//bracket was here
+
+
+#endif
+
+
+
+#if COMPILER == 0
+    catch( double price)         //Is using a catch when there isn't an error appropriate? Wouldn't return work better?
     {
     ofstream input;
 
 #if COMPILER == 1
-    input.open("inputfiles/set_to_sell_or_buy.txt");
+    input.open("inputfiles/set_to_sell_or_buy.txt", ios::app);
 #endif
+
+
+
 
 #if COMPILER == 0
-    input.open("set_to_sell_or_buy.txt");
-#endif
+    //input.open("set_to_sell_or_buy.txt");              //I'm assuming this isn't needed twice
+
 
         input.open("set_to_sell_or_buy.txt", ios::app);
+#endif
+
+
+
+
+
+
+        if(!input.is_open())
+        {
+            cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
+            //This doesn't exit when there's an error. Will it need to?
+        }
+        // a way of getting to the end of the file will need to be implemented
+            input<<account_id<<" "<<stock<<" "<<price<<endl;
+
+            input.close();
+        }
+#endif
+
+
+
+
+
+/*
+#if COMPILER == 1
+        cout<<"would you like to add another stock if so type yes"<<endl;
+                cin>>retry;
+                if(retry == "yes")
+                {
+                    this->setstockformarketcharge();
+                }
+#endif
+*/
+
+
+
+
+
+
+#if COMPILER == 0                             //This won't work with the sleep() function
     if(!input.is_open())
     {
         cerr<<"Error accessing the stock to sell or buy for a market change"<<endl;
@@ -464,6 +732,7 @@ void Account::setstockformarketcharge(){
             {
                 this->setstockformarketcharge();
             }
+#endif
     
 }
 void Account::search_forstock(string stock){
@@ -599,6 +868,22 @@ void Account::read_accountinfo(){
         throw readFile_error;
     }
     input>>balance;
+
+#if COMPILER == 1
+    while( input >> name >> number)
+    {
+        stock_name.push_back(name);
+        number_shares.push_back(number);
+    }
+#endif
+
+    /*Comment in future.  This doesn't work on linux and I wouldn't
+     * think it would work on Xcode either, but that needs error checked on it's own.  I added these flags so
+     * they can be error checked separately, but This will be graded using linux, not Xcode.
+     *
+     * Note: Using eof often fails especially if there is an empty line at the end of the file
+     */
+#if COMPILER == 0
     while( !input.eof())
     {
         input>>name;
@@ -606,6 +891,7 @@ void Account::read_accountinfo(){
         stock_name.push_back(name);
         number_shares.push_back(number);
     }
+#endif
 
 
     input.close();
@@ -654,7 +940,7 @@ void Account::menu(){
     		return;
     	}
     }
-    catch( char prompt )
+    catch( char prompt )//What is this doing?  Please comment.
     {
         
     }
@@ -681,11 +967,43 @@ void Account::menu(){
         switch( choice ){
         
             case 1: // Buy stock
-            	buyStocks();
+            {
+            	string name;
+            	int number;
+            	cout << "Enter name of stock to buy: " << endl;
+            	cin >> name;
+            	cout << "Enter the number of Stocks you would like to buy: " << endl;
+
+            	while(!(cin >> number)){
+            		cin.clear();
+
+            		while(cin.get() != '\n')
+            			continue;
+
+            			cout << "Invalid input.  Try again: ";
+            	}
+            	buyStocks(name, number);
                 break;
+            }
             case 2: //Sell stock
-            	sellStocks();
+            {
+            	string name;
+            	int number;
+            	cout << "Enter name of stock to sell: " << endl;
+            	cin >> name;
+            	cout << "Enter the number of Stocks you would like to sell: " << endl;
+
+            	while(!(cin >> number)){
+            		cin.clear();
+
+            		while(cin.get() != '\n')
+            			continue;
+
+            			cout << "Invalid input.  Try again: ";
+            	}
+            	sellStocks(name, number);
                 break;
+            }
             case 3: // set stock to buy or sell
                 setstockformarketcharge();
                 break;
@@ -765,7 +1083,7 @@ void Log_in::locate_account(string entered_id, string entered_password ){
                     Administrator user(user_id, password, type);
                     input.close();
                     user.menu();
-                    throw password;
+                    throw password; //Why are we throwing password?  Comment?
                 }
                 
             }
@@ -800,7 +1118,7 @@ void Log_in:: login(){
     getline(cin, user_id);
     cout<<"Please enter in your password: "<<endl;
     getline(cin, password);
-    locate_account( user_id, password);//seeing if there information is there
+    locate_account( user_id, password);//seeing if their information is there
             incorrect = 2;
         }
         
@@ -819,7 +1137,7 @@ void Log_in:: login(){
         }
        
 
-    }while( exit != "exit");
+    }while( exit != "exit");   //This doesn't work.  Needs error checked..
 
 
   /*  catch( int error )
