@@ -113,10 +113,11 @@ int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price,
 			if(stock_name[i].compare(NewStock)==0)
 			{
 				if(stock_price[i] >= price)
-		{
+				{
+					cout << account_id << " selling " << numStocks  << " "<< NewStock << " stocks for " << stock_price[i]<< endl;
 				sellStocks(NewStock, numStocks);
 				return 1;
-		}
+				}
 				break;
 			}
 
@@ -140,6 +141,7 @@ void Administrator::backgroundUpdate()
 //	input.open("inputfiles/set_to_sell_or_buy.txt");
 
 	int exit = 0;
+	cout << "Auto update is now running. Message will be displayed when stocks are bought or sold" << endl;
 	cout << "ctrl c to exit" << endl;
 	//cin >> exit;
 

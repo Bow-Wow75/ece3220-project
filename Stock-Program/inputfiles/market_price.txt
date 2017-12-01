@@ -1,6 +1,6 @@
 Amazon 500
 Boeing 1000
-AMD 20
+AMD 30
 Intel 300
 Alphabet_Inc .04
 Apple_Inc .03
