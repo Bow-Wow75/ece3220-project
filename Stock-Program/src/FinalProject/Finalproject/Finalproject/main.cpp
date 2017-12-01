@@ -62,7 +62,7 @@ class Account:public Log_in{
         void loadstocks();// may use later in the code
         void setstockformarketcharge();
         void search_forstock(string stock); // will open available stocks and search for that stock in the folder
-        void checkBackgroundUpdate(string stock_name, int numStocks, double price, int action);
+        int checkBackgroundUpdate(string stock_name, int numStocks, double price, int action);
 
 };
 class Administrator: public Account {//extension of the case account class
@@ -82,7 +82,7 @@ public:
     void backgroundUpdate();
 };
 
-void Account::checkBackgroundUpdate(string NewStock, int numStocks, double price, int action)
+int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price, int action)
 {
 	this->read_accountinfo();
 	this->readstock_price();
@@ -106,6 +106,7 @@ void Account::checkBackgroundUpdate(string NewStock, int numStocks, double price
 		{
 				cout << account_id << " buying " << numStocks  << " "<< NewStock << " stocks for " << stock_price[i]<< endl;
 			buyStocks(NewStock, numStocks);
+			return 1;
 		}
 			break;
 		}
@@ -118,22 +119,24 @@ void Account::checkBackgroundUpdate(string NewStock, int numStocks, double price
 				if(stock_price[i] >= price)
 		{
 				sellStocks(NewStock, numStocks);
+				return 1;
 		}
 				break;
 			}
 
 		}
 	}
+	return 0;
 
 }
 
 void Administrator::backgroundUpdate()
 {
-	ifstream input;
-	input.open("inputfiles/set_to_sell_or_buy.txt");
+//	ifstream input;
+//	input.open("inputfiles/set_to_sell_or_buy.txt");
 
 	int exit = 0;
-	cout << "Enter -1 to exit auto update mode" << endl;
+	cout << "ctrl c to exit" << endl;
 	//cin >> exit;
 
 	int numStocks = 0;
@@ -147,6 +150,11 @@ void Administrator::backgroundUpdate()
 //	cin >> exit;
 	sleep(SLEEPTIME);//sleep takes in seconds
 
+	ifstream input;
+	input.open("inputfiles/set_to_sell_or_buy.txt");
+
+	ofstream outputTemp;
+	outputTemp.open("inputfiles/temp.txt", ios::app);
 
 //		this->readstock_price();//I don't know why "this->" is needed
 		while(input >> account_id >> stock_name >> numStocks >> price >> action)
@@ -155,13 +163,26 @@ void Administrator::backgroundUpdate()
 			//The buy/sell functions will need modified to take the name and number as arguments instead of asking for them
 
 
-				temp.checkBackgroundUpdate(stock_name, numStocks, price, action);
+				if(temp.checkBackgroundUpdate(stock_name, numStocks, price, action) == 0)
+				{
+					outputTemp << account_id << " " << stock_name << " " << numStocks << " " << price << " " << action << endl;
+				}
+				else
+				{
+
+				}
 
 
 
 		}
-		input.clear();          ///These ensure we go back to the top of the file
-		input.seekg(0, ios::beg);
+
+		outputTemp.close();
+		input.close();
+	    remove("inputfiles/set_to_sell_or_buy.txt");
+	    rename("inputfiles/temp.txt","inputfiles/set_to_sell_or_buy.txt");
+
+	//	input.clear();          ///These ensure we go back to the top of the file
+	//	input.seekg(0, ios::beg);
 
 	}
 
