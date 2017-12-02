@@ -96,11 +96,7 @@ int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price,
 
 
 	int i = 0;
-/*	for(i=0; stock_name.size();i++)
-	{
-		cout << stock_name[i] << endl;
-	}
-	*/
+
 
 	for(i=0;i<stock_name.size();i++)//iterate until stock is found
 	{
@@ -124,10 +120,11 @@ int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price,
 			if(stock_name[i].compare(NewStock)==0)
 			{
 				if(stock_price[i] >= price)
-		{
+				{
+					cout << account_id << " selling " << numStocks  << " "<< NewStock << " stocks for " << stock_price[i]<< endl;
 				sellStocks(NewStock, numStocks);
 				return 1;
-		}
+				}
 				break;
 			}
 
@@ -139,10 +136,19 @@ int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price,
 
 void Administrator::backgroundUpdate()
 {
+													/*This function will loop and buy/sell user stocks based on their preferences.
+													 * Right now the only way to exit out of this loop is to use ctrl c to exit
+													 * the entire program.  Mulithreading would be one solution to this and we could
+													 * even run this function in the background, but that is currently
+													 * a little out of scope for this project.
+													 *
+													 * In the future, multithreading will hopefully be implemented
+													 */
 //	ifstream input;
 //	input.open("inputfiles/set_to_sell_or_buy.txt");
 
 	int exit = 0;
+	cout << "Auto update is now running. Message will be displayed when stocks are bought or sold" << endl;
 	cout << "ctrl c to exit" << endl;
 	//cin >> exit;
 
@@ -161,7 +167,10 @@ void Administrator::backgroundUpdate()
 	input.open("inputfiles/set_to_sell_or_buy.txt");
 
 	ofstream outputTemp;
-	outputTemp.open("inputfiles/temp.txt", ios::app);
+	outputTemp.open("inputfiles/temp.txt", ios::app);    				/*This temp file is used so that we can essentially
+																		 *delete the line from the set to buy/sell file once
+																		 *that stock has been bought. We rewrite the file and then delete
+																		 *the original and rename the temp file*/
 
 //		this->readstock_price();//I don't know why "this->" is needed
 		while(input >> account_id >> stock_name >> numStocks >> price >> action)
@@ -176,7 +185,7 @@ void Administrator::backgroundUpdate()
 				}
 				else
 				{
-
+					//This is run instead so the line that was run is not written back to the file
 				}
 
 
