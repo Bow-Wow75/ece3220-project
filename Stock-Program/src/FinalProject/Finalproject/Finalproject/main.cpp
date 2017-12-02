@@ -8,7 +8,7 @@
 //......................COMPILE USING C++11 STANDARDS.........................//////
 
 
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 #define SLEEPTIME 5  //in seconds
 
@@ -51,6 +51,8 @@ class Account:public Log_in{
         Account(){};
         Account(string user_id, string password, int type);
         ~Account(){};
+        void operator+(int add);
+        void operator-(int subtract);
         void sellStocks(string name, int number);
         void update_user_file();
         void buyStocks(string name, int number);
@@ -81,7 +83,12 @@ public:
     virtual void display_all();
     void backgroundUpdate();
 };
-
+void Account:: operator-(int subtract){//simple and not completely need but demomstates operators which is a requirement to meet
+    balance = balance - subtract;
+}
+void Account:: operator+(int add){//simple and not completely need but demomstates operators which is a requirement to meet
+    balance = balance + add;
+}
 int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price, int action)
 {
 	this->read_accountinfo();
@@ -192,36 +199,48 @@ void Administrator::backgroundUpdate()
 }
 
 void Administrator:: change_password(){
+    // backwords way of changing the file and i dont like it all since im rewriteing the whole file. Luis when grading this if you wont mind emailing my school email pawprint is nabyq6 i would like to know if that was an easier way of doing this. I tried setting the trunc flag however whenever i did the file would never open.
     string user_name,space;
-    string id, password, new_password;
+    string file_password, file_id;
     int type;
+    vector<string> id, password;
+    vector<int> level;
     
     int error = 0;
     getline( cin, space);
-    cout<<"Enter the name of the user whose was word needs to be change:"<<endl;
+    cout<<"Enter the name of the user whose password needs to be change:"<<endl;
     getline(cin, user_name);
     try
     {
     fstream input;
-        input.open(input_file, ios::app);           ///What does this do?
-        											//Update: this needs c++11 standard to compile
+       /* input.open(input_file, ios::app);           What does this do? Eric this opebs a file for appending mean that it will write to the end of the text file by setting the app flag.
+                                                            Update: this needs c++11 standard to compile*/
+        input.open(input_file);
+        //input.seekp(0, ios::beg);
     if(!input.is_open())
     {
         throw error;
     }
         while(!input.eof())
     {
-        input>>id;
-             if(user_name.compare(id) == 0)
+        input>>file_id;
+        id.push_back(file_id);
+        
+        if(user_name.compare(file_id) == 0)
              {
+                 input>>file_password;
+                 string new_password;
                  cout<<"Enter in your new password"<<endl;
-                 getline(cin, new_password);
-                 input<<new_password;//need to get this to work
-                 input.close();
-                 throw 21;
+                 cin>>new_password;
+                 password.push_back(new_password);
+                 cout<<"Password as been successfully changed"<<endl;
              }
-        input>>password;
+        else{
+            input>>file_password;
+            password.push_back(file_password);
+            }
         input>>type;
+        level.push_back(type);
     }
         input.close();
     }
@@ -229,13 +248,21 @@ void Administrator:: change_password(){
         {
         switch(error){
                 
-        case 0: cout<<"Unable to change password: try again if you would like"<<endl;
-                break;
-        case 21: cout<<"Password has been changed"<<endl;
+        case 0: cout<<"Unable to change password: try again if you would like but accounts file could not be opened"<<endl;
                 break;
         }
     }
-    
+    ofstream input;
+    input.open(input_file);//rewrite the vectors to the entire file with the password update. would be a horrible idea if the file was large. only way i could get function to work 
+    if( !input.is_open())
+    {
+        cerr<<"apon rewrite the file could not be opened";
+    }
+    for( int i = 0; i < id.size()-1; i++)
+    {
+        input<<id[i]<<" "<<password[i]<<" "<<level[i]<<endl;
+    }
+    input.close();
     
 }
 void Administrator:: create_account(int type){
@@ -445,12 +472,15 @@ int check = 0;
 			{
 				stock_name.erase(stock_name.begin()+i);
 				number_shares.erase(number_shares.begin()+i);
-				balance += number*stock_price[i];
+                //operator add to demonstate ablility to use correctly
+                operator+(number*stock_price[i]);
+				//balance += number*stock_price[i];
 				check = 1;
 			}
 			else{//update stock numbers and balance
 			number_shares[i] -= number;
-			balance += number*stock_price[i];
+            operator+(number*stock_price[i]);
+            //balance += number*stock_price[i];
 			check = 1;
 			}
 			break;
@@ -528,7 +558,8 @@ int check = 0;
 				throw 1;
 			}
 			number_shares[i] += number;//update share numbers
-			balance -= number*stock_price[i];
+            operator-(number*stock_price[i]);
+            //balance -= number*stock_price[i];
 			check = 1;
 			break;
 		}
@@ -562,7 +593,8 @@ int check = 0;
 		}
 
 		number_shares[i] = number;//set share number
-		balance -= number*stock_price[i];//update balance
+        operator-(number*stock_price[i]);
+        //balance -= number*stock_price[i];//update balance
 	}
 
 	update_user_file();//update user file
@@ -714,7 +746,7 @@ catch(double price){
 
 
 
-
+/*
 
 #if COMPILER == 0                             //This won't work with the sleep() function
     if(!input.is_open())
@@ -733,7 +765,7 @@ catch(double price){
                 this->setstockformarketcharge();
             }
 #endif
-    
+    */
 }
 void Account::search_forstock(string stock){
     double price;
