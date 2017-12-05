@@ -416,6 +416,13 @@ void Administrator:: display_all(){// displays all the accounts with the company
     cout << endl <<"End of list of accounts"<<endl;
     
 }
+
+/*
+ * When logging in as another user there is no way to log out as them.  It throws an error.
+ * I don't know how you implemented this. -Erik
+ */
+
+
 void Administrator:: menu()// menu for the admin user with the type = 5 in file
 {
     string space;
