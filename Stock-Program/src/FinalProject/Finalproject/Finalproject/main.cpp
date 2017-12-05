@@ -8,7 +8,7 @@
 //......................COMPILE USING C++11 STANDARDS.........................//////
 
 
-#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 #define SLEEPTIME 5  //in seconds
 
@@ -51,6 +51,8 @@ class Account:public Log_in{
         Account(){};
         Account(string user_id, string password, int type);
         ~Account(){};
+        void operator+(int add);
+        void operator-(int subtract);
         void sellStocks(string name, int number);
         void update_user_file();
         void buyStocks(string name, int number);
@@ -81,7 +83,12 @@ public:
     virtual void display_all();
     void backgroundUpdate();
 };
-
+void Account:: operator-(int subtract){//simple and not completely need but demomstates operators which is a requirement to meet
+    balance = balance - subtract;
+}
+void Account:: operator+(int add){//simple and not completely need but demomstates operators which is a requirement to meet
+    balance = balance + add;
+}
 int Account::checkBackgroundUpdate(string NewStock, int numStocks, double price, int action)
 {
 	this->read_accountinfo();
@@ -200,54 +207,85 @@ void Administrator::backgroundUpdate()
 
 }
 
-void Administrator:: change_password(){
+void Administrator:: change_password(){ // allows admin to reset a password. However they can not see the original password
+    
+    // backwords way of changing the file and i dont like it all since im rewriteing the whole file. Luis when grading this if you wont mind emailing my school email pawprint is nabyq6 i would like to know if that was an easier way of doing this. I tried setting the trunc flag however whenever i did the file would never open.
     string user_name,space;
-    string id, password, new_password;
+    string file_password, file_id;
     int type;
+    vector<string> id, password;
+    vector<int> level;
     
     int error = 0;
     getline( cin, space);
-    cout<<"Enter the name of the user whose was word needs to be change:"<<endl;
+    cout<<"Enter the name of the user whose password needs to be change:"<<endl;
     getline(cin, user_name);
     try
     {
     fstream input;
-        input.open(input_file, ios::app);           ///What does this do?
-        											//Update: this needs c++11 standard to compile
+       /* input.open(input_file, ios::app);           What does this do? Eric this opebs a file for appending mean that it will write to the end of the text file by setting the app flag.
+                                                            Update: this needs c++11 standard to compile*/
+        input.open(input_file);//reads the entire  file and stores everything in vectors
+        //input.seekp(0, ios::beg);
     if(!input.is_open())
     {
+        error = 1;
         throw error;
     }
         while(!input.eof())
     {
-        input>>id;
-             if(user_name.compare(id) == 0)
+        input>>file_id;
+        id.push_back(file_id);
+        
+        if(user_name.compare(file_id) == 0)
              {
+                 input>>file_password;
+                 string new_password;
                  cout<<"Enter in your new password"<<endl;
-                 getline(cin, new_password);
-                 input<<new_password;//need to get this to work
-                 input.close();
-                 throw 21;
+                 cin>>new_password;
+                 password.push_back(new_password);
+                 cout<<"Password as been successfully changed"<<endl;
+                 error = 2;
              }
-        input>>password;
+        else{
+            input>>file_password;
+            password.push_back(file_password);
+            }
         input>>type;
+        level.push_back(type);
     }
         input.close();
+        if( error != 2)
+        {
+            throw error;
+        }
+        
+            
     }
-    catch( int error)
+    catch( int error)// what to print depending on error thrown
         {
         switch(error){
                 
-        case 0: cout<<"Unable to change password: try again if you would like"<<endl;
+        case 1: cout<<"Unable to change password: try again if you would like but accounts file could not be opened"<<endl;
                 break;
-        case 21: cout<<"Password has been changed"<<endl;
-                break;
+        case 0: cout<<"Unable to locate account in system directory"<<endl<<endl;
+            
         }
     }
-    
+    ofstream input;//ios::out flag clears the entire file
+    input.open(input_file);//rewrite the vectors to the entire file with the password update. would be a horrible idea if the file was large. only way i could get function to work file is clear a whole file and rewrite everything trunc flag would compile
+    if( !input.is_open())
+    {
+        cerr<<"apon rewrite the file could not be opened";
+    }
+    for( int i = 0; i < id.size()-1; i++)
+    {
+        input<<id[i]<<" "<<password[i]<<" "<<level[i]<<endl;
+    }
+    input.close();
     
 }
-void Administrator:: create_account(int type){
+void Administrator:: create_account(int type){//allows the admin to create an account once admin is logged in.
     string user_name, password;
     string space;
     try{
@@ -276,7 +314,7 @@ void Administrator:: create_account(int type){
 
 #if COMPILER == 0                      //This code doesn't add a new line for the users so they will be in one line
     ofstream input;
-    input.open(input_file, ios::app);
+    input.open(input_file, ios::app);//append flag is set and will allow the file to be write to from the end of the file
     if( !input.is_open() )
     {
         throw 0;
@@ -292,11 +330,11 @@ void Administrator:: create_account(int type){
 #endif
 
     catch(...){
-        cout<<"error writing to the creating account"<<endl;
+        cout<<"error writing to the creating account"<<endl;// throws are if the file doesnt open
     }
 }
 
-void Administrator:: display_all(){
+void Administrator:: display_all(){// displays all the accounts with the company
     string user_name, password;
     int type;
     
@@ -359,7 +397,7 @@ void Administrator:: display_all(){
     cout << endl <<"End of list of accounts"<<endl;
     
 }
-void Administrator:: menu()
+void Administrator:: menu()// menu for the admin user with the type = 5 in file
 {
     string space;
     int choice = 0;
@@ -411,11 +449,10 @@ try{
 }
     
     catch(...){
-        cout<<"you have been logged out of your account"<<endl;
+        cout<<"you have been logged out of your account"<<endl;// thrown whenever the account is signed out of
     }
-    
 }
-Administrator::Administrator( string user_id, string password, int type)
+Administrator::Administrator( string user_id, string password, int type)//admin constructor
 {
     admin_id = user_id;
     admin_password = password;
@@ -424,13 +461,13 @@ Administrator::Administrator( string user_id, string password, int type)
 //.........END HEADER........//
 //..........from Erik's functions........//
 
-void Account::sellStocks(string name, int number)
+void Account::sellStocks(string name, int number)//allows the user to sell a stock if it available on the list of stocks that company trades
 {
 int check = 0;
 
 	while(number <= 0)
 	{
-		cout << "Not a valid number of stocks" << endl << "Enter number of Stocks you would like to sell: " << endl;
+		cout << "Not a valid number of stocks" << endl << "Enter number of Stocks you would like to sell: " << endl;//error check for if the number of stocks to by is below 0
 
 		while(!(cin >> number)){
 			cin.clear();
@@ -454,12 +491,15 @@ int check = 0;
 			{
 				stock_name.erase(stock_name.begin()+i);
 				number_shares.erase(number_shares.begin()+i);
-				balance += number*stock_price[i];
+                //operator add to demonstate ablility to use correctly
+                operator+(number*stock_price[i]);
+				//balance += number*stock_price[i];
 				check = 1;
 			}
 			else{//update stock numbers and balance
 			number_shares[i] -= number;
-			balance += number*stock_price[i];
+            operator+(number*stock_price[i]);
+            //balance += number*stock_price[i];
 			check = 1;
 			}
 			break;
@@ -478,10 +518,10 @@ int check = 0;
 	return;
 }
 
-void Account::update_user_file()
+void Account::update_user_file()//updates the users file if stocks are brought or solid.
 {
 		  string filename;
-		    filename = "inputfiles/accounts/" +account_id + ".txt";
+		    filename = account_id + ".txt";
 
 
 
@@ -509,7 +549,7 @@ void Account::update_user_file()
 
 }
 
-void Account::buyStocks(string name, int number)
+void Account::buyStocks(string name, int number)// allows the user to buy stocks if the company is selling them at the current time
 {
 int check = 0;
 
@@ -537,7 +577,8 @@ int check = 0;
 				throw 1;
 			}
 			number_shares[i] += number;//update share numbers
-			balance -= number*stock_price[i];
+            operator-(number*stock_price[i]);
+            //balance -= number*stock_price[i];
 			check = 1;
 			break;
 		}
@@ -571,13 +612,14 @@ int check = 0;
 		}
 
 		number_shares[i] = number;//set share number
-		balance -= number*stock_price[i];//update balance
+        operator-(number*stock_price[i]);
+        //balance -= number*stock_price[i];//update balance
 	}
 
 	update_user_file();//update user file
 	return;
 }
-void Account::setstockformarketcharge(){
+void Account::setstockformarketcharge(){// enables the user to set the stock for buy or sale. FOr a preset amount whenever there is an update in that file
     string stock;
     string retry;
 
@@ -603,7 +645,7 @@ void Account::setstockformarketcharge(){
     	double priceSet = 0;
     	int action = 0;
     	int number = 0;
-    	cout << "Enter (1) to buy or (2) to sell: " << endl;
+    	cout << "Enter (1) to buy or (2) to sell: " << endl;// checks the users input if they want to buy or sell the stock when an update occurs
     	cin >> action;
 
     	if(action == 1)
@@ -635,7 +677,7 @@ void Account::setstockformarketcharge(){
     		cout << "Invalid number entered" << endl;
 
 try{
-    this->search_forstock(stock);
+    this->search_forstock(stock);// sreach to insure the stock is availabel
         cout<<"Sorry your stock can not be found"<<endl;
         cout<<"Would you like to try again if so enter yes: "<<endl;
         cin>>retry;
@@ -647,7 +689,7 @@ try{
 
 
 #if COMPILER == 1
-catch(double price){
+catch(double price){//if the stock is available set prices parameters
 //There isn't anything needed to do with this
 }
 	ofstream output;
@@ -704,11 +746,6 @@ catch(double price){
             input.close();
         }
 #endif
-
-
-
-
-
 /*
 #if COMPILER == 1
         cout<<"would you like to add another stock if so type yes"<<endl;
@@ -723,7 +760,7 @@ catch(double price){
 
 
 
-
+/*
 
 #if COMPILER == 0                             //This won't work with the sleep() function
     if(!input.is_open())
@@ -742,9 +779,9 @@ catch(double price){
                 this->setstockformarketcharge();
             }
 #endif
-    
+    */
 }
-void Account::search_forstock(string stock){
+void Account::search_forstock(string stock){//functions searches to insure the stock is available for the client
     double price;
     int found = 9;
     string name;
@@ -770,7 +807,7 @@ void Account::search_forstock(string stock){
             input>>name;
             input>>price;
             i++;
-            if(stock.compare(name) == 0){
+            if(stock.compare(name) == 0){//if the names equal will take in the stock
                 stock_price.push_back(price);
                 cout<<""<<name<<endl;
                 cout<<""<<price<<endl;
@@ -782,7 +819,7 @@ void Account::search_forstock(string stock){
             if( input.eof() )
             {
                 input.clear();
-                input.seekg(0, ios::beg);
+                input.seekg(0, ios::beg);//resets the flag for the beginning of the file. so if they go to search for another stock in runs through the entire file
                 found = 0;
                 cout<<"Stock was not found: "<<stock <<endl;
             }
@@ -791,16 +828,7 @@ void Account::search_forstock(string stock){
     input.close();
     
 }
-
-void printMenu()
-{
-	cout << "(1) See Available stocks: " << endl
-		 << "(2) Sell stocks: " << endl
-		 << "(3) Set Stock Seller Requirements" << endl
-		 << "(4) Account info: " << endl
-		 << "(5) Update account balance: " << endl;
-}
-void Account::readstock_price(){
+void Account::readstock_price(){// reads the current price of the stock from the updated file. and shows the user there stocks current value
     
     ifstream input;
     string name;
@@ -815,7 +843,7 @@ void Account::readstock_price(){
    
     if( !input.is_open())
     {
-        cout<<"error reading in market prices"<<endl;
+        cout<<"error reading in market prices"<<endl;// throws back to the menu function
         throw 91;
     }
 for( int i = 0; i < (stock_name.size()); i++){
@@ -863,7 +891,7 @@ for( int i = 0; i < (stock_name.size()); i++){
     input.close();
     
 }
-void Account::read_accountinfo(){
+void Account::read_accountinfo(){// reads in the users profilo include balance. companies they own stock in and how many shares they own
     string filename;
 #if COMPILER == 0
     filename = account_id +".txt";
@@ -885,7 +913,7 @@ void Account::read_accountinfo(){
 #if COMPILER == 1
     while( input >> name >> number)
     {
-        stock_name.push_back(name);
+        stock_name.push_back(name);//pushes the information onto the object that was created upon login
         number_shares.push_back(number);
     }
 #endif
@@ -918,7 +946,7 @@ void Account::read_accountinfo(){
     }
 }
 
-void  Account::display_profolio(){
+void  Account::display_profolio(){//displays the users complete profilo for there eyes when they are logged into the account
     
     int i;
     cout<<"Profolio for "<<account_id<<endl;
@@ -933,7 +961,7 @@ void  Account::display_profolio(){
       //  cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<endl;
     }
 }
-void Account::menu(){
+void Account::menu(){// displays the menu for the user to decide what they want to do whenever they are logged into there account
     //User function
     int choice = 0;
     try{
@@ -959,14 +987,14 @@ void Account::menu(){
     }
     do{
     try{
-    if( account_type == 5 )
+    if( account_type == 5 )// all opitions available to the user
         {
         cout<<"Select what you would like to do"<<endl
         <<"\t1: Buy stocks: "<<endl
         <<"\t2: Sell stocks: "<<endl
         <<"\t3: Set stock to buy or sell: "<<endl
-        <<"\t4: Display profolio: "<<endl
-        <<"\t5: To Exit your profolio: "<<endl;
+        <<"\t4: Display protfolio: "<<endl
+        <<"\t5: To Exit your protfolio: "<<endl;
         
         while(!(cin >> choice)){
         			cin.clear();
@@ -1029,7 +1057,7 @@ void Account::menu(){
         }
     }//for try statement
 
-    catch(int menuError)
+    catch(int menuError)//throw statement from the entire try block above3
     {
     	switch(menuError)
     	{
@@ -1053,13 +1081,16 @@ void Account::menu(){
     	}
     }
     }while( choice !=5 );
+    
+    cout<<"You are logged out"<<endl<<endl;
+    
 }
-void Log_in::locate_account(string entered_id, string entered_password ){
+void Log_in::locate_account(string entered_id, string entered_password ){// when user logs in it verifies that there information matches an account located in account.txt
     int type;
     int input_error = 1;
    string user_id, password;
     ifstream input;
-
+    char out;
 
 #if COMPILER ==1
     //................gnu compiler needs input_file defined.....................................//
@@ -1088,15 +1119,17 @@ void Log_in::locate_account(string entered_id, string entered_password ){
                     Account user(user_id, password, type);
                     input.close();
                     user.menu();
-
-                    throw password;
+                    input.close();
+                    out = 1;
+                    throw out;
                 }
-                
                 if( type == 1){
-                    Administrator user(user_id, password, type);
+                    Administrator user(user_id, password, type);//will create an admin class when type is 1
                     input.close();
                     user.menu();
-                    throw password; //Why are we throwing password?  Comment?
+                    input.close();
+                    out = '1';
+                    throw out;
                 }
                 
             }
@@ -1106,27 +1139,27 @@ void Log_in::locate_account(string entered_id, string entered_password ){
     input.close();
         throw 1;
 }
-Account:: Account(string user_id, string password, int type){
+Account:: Account(string user_id, string password, int type){//account class constructor with parameters
     account_id = user_id;
     account_password = password;
     account_type = type;
     
 }
-void Log_in:: login(){
+void Log_in:: login(){ //login is a seperate function not tieing to any object we change to this design to allow for the program to be an endless loop. before it would treminate because the deconstuctor would be called
     string user_id; string password, space;
     int incorrect = 1;
-    string exit = "";
+    string exit;
     do{
        
         try
         {
             if( incorrect == 2)
         {
-            cout<<"Incorrect User ID or Password: try again"<<endl;
-            cout<<"if you would like to exit type exit:  "<<endl;
+            cout<<"************Incorrect User ID or Password:***********"<<endl<<"try again"<<endl;
+            cout<<"if you would like to exit type exit, if not hit enter  "<<endl;
             getline(cin, exit);
         }
-    cout<<"Welcome"<<endl;
+    cout<<"****************Welcome **************"<<endl;
     cout<<"Please enter in your user id: "<<endl;
     getline(cin, user_id);
     cout<<"Please enter in your password: "<<endl;
@@ -1136,11 +1169,7 @@ void Log_in:: login(){
         }
         
        
-        catch(char password)
-        {
-            cout<<"You have been logged out or your account"<<endl;
-            getline(cin, space);//used to take in the enter from the user otherwise skips the user i when exiting
-        }
+        
         
         catch( int no_loggin)
         {
@@ -1148,24 +1177,18 @@ void Log_in:: login(){
                 cout<<"Unsuccesful login"<<endl;
             incorrect = 2;
         }
+        catch(...)
+        {
+            getline(cin, space);
+            //empty catch to bypass the other catch and so we can throw out of the locate_account
+        }
        
 
     }while( exit != "exit");   //This doesn't work.  Needs error checked..
-
-
-  /*  catch( int error )
-    {
-    	if(error == 0)
-        cout<<"login was successful"<<endl;
-    	if(error == 1)
-    	{
-    		cout << "Unable to open file" << endl;
-    		throw error;
-    	}
-    }*/
+   
     return;
 }
-int main( int argc, char** argv){
+int main( int argc, char** argv){//its one short main but shows the power of C++ with objects and it is beautiful beautiful
     try{
         Log_in user;
         user.login();
@@ -1173,7 +1196,8 @@ int main( int argc, char** argv){
     
     catch( int input_error)
     {
-        cout<<"Error opening the accounts file"<<endl;
+        cout<<"Error opening the accounts file"<<endl;// should ever reach this point thus this is a safe does we would know something is wayyyy wrong with login
+        
     }
     return 0;
 }
