@@ -8,7 +8,7 @@
 //......................COMPILE USING C++11 STANDARDS.........................//////
 
 
-#define COMPILER 0      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
+#define COMPILER 1      ////...........IF USING XCODE COMPILE USING 0.....GNU COMPILER USE 1...............///////////
 						////...........This is needed primarily because XCode handles file locations very oddly....../////////
 #define SLEEPTIME 5  //in seconds
 
@@ -208,6 +208,10 @@ void Administrator::backgroundUpdate()
 }
 
 void Administrator:: change_password(){ // allows admin to reset a password. However they can not see the original password
+
+	/*This function is not working on linux. I can't follow it well enough to to try and get it working.  I
+	 * edited the file names and it straight up froze my machine.
+	 */
     
     // backwords way of changing the file and i dont like it all since im rewriteing the whole file. Luis when grading this if you wont mind emailing my school email pawprint is nabyq6 i would like to know if that was an easier way of doing this. I tried setting the trunc flag however whenever i did the file would never open.
     string user_name,space;
@@ -225,7 +229,15 @@ void Administrator:: change_password(){ // allows admin to reset a password. How
     fstream input;
        /* input.open(input_file, ios::app);           What does this do? Eric this opebs a file for appending mean that it will write to the end of the text file by setting the app flag.
                                                             Update: this needs c++11 standard to compile*/
+#if COMPILER == 0
         input.open(input_file);//reads the entire  file and stores everything in vectors
+#endif
+
+#if COMPILER == 1
+	    string filename = "inputfiles/accounts/" +user_name + ".txt";
+	    input.open(filename.c_str());
+#endif
+
         //input.seekp(0, ios::beg);
     if(!input.is_open())
     {
@@ -273,7 +285,14 @@ void Administrator:: change_password(){ // allows admin to reset a password. How
         }
     }
     ofstream input;//ios::out flag clears the entire file
+#if COMPILER == 0
     input.open(input_file);//rewrite the vectors to the entire file with the password update. would be a horrible idea if the file was large. only way i could get function to work file is clear a whole file and rewrite everything trunc flag would compile
+#endif
+
+#if COMPILER == 1
+    string filename = "inputfiles/accounts/" +user_name + ".txt";
+    input.open(filename.c_str());
+#endif
     if( !input.is_open())
     {
         cerr<<"apon rewrite the file could not be opened";
@@ -521,7 +540,9 @@ int check = 0;
 void Account::update_user_file()//updates the users file if stocks are brought or solid.
 {
 		  string filename;
-		    filename = account_id + ".txt";
+		    filename = "inputfiles/accounts/" +account_id + ".txt";     /*This directory works for linux and the filesystem I'm using.
+		    															  add a flag for changing it
+		    															*/
 
 
 
