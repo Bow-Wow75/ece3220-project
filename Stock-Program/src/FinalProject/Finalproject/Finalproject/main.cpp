@@ -845,6 +845,10 @@ for( int i = 0; i < (stock_name.size()); i++){
                 found = 0;
                 cout<<"Stock was not found: "<<stock_name[i]<<endl;
                 stock_price.push_back(00);
+                throw 11;
+                /*Im not sure why this throw was deleted.  Other functions need to know when a stock isn't found
+                 *
+                 */
             }
             
             
