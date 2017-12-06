@@ -711,9 +711,19 @@ void Account::setstockformarketcharge(){// enables the user to set the stock for
 
     	    cout << endl << "Enter the max price that you would like to buy that stock for: " << endl;
     	    cin >> priceSet;
+    	    while(priceSet <= 0)
+    	    {
+    	    cout << endl << "Price must be greater than 0: " << endl;
+
+    	    cin >> priceSet;
+    	    }
 
     	    cout << endl << "How many stocks would you like to buy at/below this price?" << endl;
     	    cin >> number;
+    	    while(number <= 0){
+    	    cout << endl << "Number must be greater than 0:" << endl;
+    	    cin >> number;
+    	    }
 
     	}
 
@@ -724,18 +734,33 @@ void Account::setstockformarketcharge(){// enables the user to set the stock for
 
     	    cout << endl << "Enter the minimum price that you would like to sell that stock for: " << endl;
     	    cin >> priceSet;
+    	    while(priceSet <= 0)
+    	    {
+    	    cout << endl << "Price must be greater than 0: " << endl;
+    	    cin >> priceSet;
+    	    }
 
     	    cout << endl << "How many stocks would you like to sell at/above this price?" << endl;
     	    cin >> number;
+    	    while(number <=0)
+    	    {
+    	    cout << endl << "Number must be greater than 0:" << endl;
+    	    cin >> number;
+    	    }
 
     	}
     	else
+    	{
     		cout << "Invalid number entered" << endl;
+    		return;
+    	}
 
 try{
     this->search_forstock(stock);// sreach to insure the stock is availabel
         cout<<"Sorry your stock can not be found"<<endl;
-        cout<<"Would you like to try again if so enter yes: "<<endl;
+        return;
+     //   cout<<"Would you like to try again if so enter yes: "<<endl;
+      //
         cin>>retry;
     }
     
