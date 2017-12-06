@@ -1,7 +1,7 @@
 30000
 Amazon 30
 Netflix 24
-Beoing 25
+Boeing 25
 AMD 50
 Intel 400
 Alphabet_Inc 4
