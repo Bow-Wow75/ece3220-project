@@ -25,6 +25,7 @@
 #include <string>
 #include <string.h>
 #include <unistd.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -980,12 +981,12 @@ void  Account::display_profolio(){//displays the users complete profilo for ther
     cout<<"Profolio for "<<account_id<<endl;
     cout<<"Account Balance: "<<balance<<endl;
     
-    cout<<"Stock "<<"Shares "<<"Price"<<endl;
+    cout<<left<<setw(15)<<"Stock"<<setw(15)<<"Shares"<<setw(15)<<"Price"<<endl;
     
     for( i = 0; i <stock_name.size(); i++)
     {
       //  cout << "test1" << endl;
-        cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<" "<<stock_price[i]<<endl;
+        cout<<left<<setw(15)<<stock_name[i]<<setw(15)<<number_shares[i]<<setw(15)<<stock_price[i]<<endl;
       //  cout<<" "<<stock_name[i]<<" "<<number_shares[i]<<endl;
     }
 }
