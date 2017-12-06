@@ -1,2 +1,3 @@
 nabyq6 Netflix 193
 nabyq6 Amazon 500
+steve Boeing 1000

@@ -308,7 +308,7 @@ void Administrator:: create_account(int type){//allows the admin to create an ac
            }
                output.close();
 
-           }
+        
 
 #endif
 
@@ -322,13 +322,34 @@ void Administrator:: create_account(int type){//allows the admin to create an ac
     {
         input<<user_name;
         input<<" "<<password;
-        input<<" "<<type;
+        input<<" "<<type<<endl;
     }
         input.close();
         
-    }
+    
 #endif
 
+    int balance;
+        string filename;
+    cout<<"what is the balance they user wants to despoit"<<endl;
+    cin>>balance;
+    ofstream output;
+        filename =  user_name + ".txt";
+    cout<<filename<<endl;
+    output.open(filename);
+    if(!output.is_open())
+    {
+        throw  balance;//throw as error
+    }
+    output<<balance;
+    output.close();
+    
+    }
+
+    catch(int balance)
+    {
+        cout<<"Error creating new protfolio file"<<endl;
+    }
     catch(...){
         cout<<"error writing to the creating account"<<endl;// throws are if the file doesnt open
     }
@@ -1177,6 +1198,10 @@ void Log_in:: login(){ //login is a seperate function not tieing to any object w
         {
             getline(cin, space);
             //empty catch to bypass the other catch and so we can throw out of the locate_account
+            for( int i = 0; i < 1000; i++)
+            {
+                cout<<endl;
+            }
         }
        
 
