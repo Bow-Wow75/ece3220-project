@@ -13,7 +13,7 @@
 #define SLEEPTIME 5  //in seconds
 
 #define ACCOUNTS "accounts.txt"
-#define STOCKS "stocks.txt"
+//#define STOCKS "stocks.txt"
 
 #include <iostream>
 #include <fstream>
@@ -235,7 +235,7 @@ void Administrator:: change_password(){ // allows admin to reset a password. How
 #endif
 
 #if COMPILER == 1
-	    string filename = "inputfiles/accounts/" +user_name + ".txt";
+	    string filename = "inputfiles/accounts.txt";
 	    input.open(filename.c_str());
 #endif
 
@@ -291,7 +291,7 @@ void Administrator:: change_password(){ // allows admin to reset a password. How
 #endif
 
 #if COMPILER == 1
-    string filename = "inputfiles/accounts/" +user_name + ".txt";
+    string filename = "inputfiles/accounts.txt";
     input.open(filename.c_str());
 #endif
     if( !input.is_open())
@@ -315,18 +315,19 @@ void Administrator:: create_account(int type){//allows the admin to create an ac
         cout<<"Enter the password you would like to"<<endl;
         getline(cin, password);
 
+
 #if COMPILER == 1                                            //This was added because Xcode handles files in a manner that
         													//No other compiler can. We also added a newline for the new user
-        ofstream output;
-           output.open("inputfiles/accounts.txt", ios::app);
-           if( !output.is_open() )
+        ofstream input;
+           input.open("inputfiles/accounts.txt", ios::app);
+           if( !input.is_open() )
            {
                throw 0;
            }
            {
-        	   output << endl << user_name << " " << password << " " << type;
+        	   input << endl << user_name << " " << password << " " << type;
            }
-               output.close();
+               input.close();
 
         
 
@@ -354,8 +355,13 @@ void Administrator:: create_account(int type){//allows the admin to create an ac
     cout<<"what is the balance they user wants to despoit"<<endl;
     cin>>balance;
     ofstream output;
+#if COMPILER == 1
+filename = "inputfiles/accounts/" + user_name + ".txt";
+#endif
+#if COMPILER == 0
         filename =  user_name + ".txt";
-    cout<<filename<<endl;
+#endif
+//    cout<<filename<<endl;
     output.open(filename);
     if(!output.is_open())
     {
