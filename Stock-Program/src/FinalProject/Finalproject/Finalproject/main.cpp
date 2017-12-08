@@ -1074,8 +1074,8 @@ void Account::menu(){// displays the menu for the user to decide what they want 
         <<"\t1: Buy stocks: "<<endl
         <<"\t2: Sell stocks: "<<endl
         <<"\t3: Set stock to buy or sell: "<<endl
-        <<"\t4: Display protfolio: "<<endl
-        <<"\t5: To Exit your protfolio: "<<endl;
+        <<"\t4: Display portfolio: "<<endl
+        <<"\t5: To Exit your portfolio: "<<endl;
         
         while(!(cin >> choice)){
         			cin.clear();
